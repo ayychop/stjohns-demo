@@ -1,21 +1,32 @@
 import { useEffect, useRef, useState } from 'react'
-import { animate, motion, useInView, useMotionValue, useReducedMotion, useSpring } from 'framer-motion'
+import { animate, m, useInView, useMotionValue, useReducedMotion, useSpring } from 'framer-motion'
 import Lenis from 'lenis'
 
 const EASE = [0.22, 1, 0.36, 1]
+
+let lenis = null
 
 /** Buttery page scrolling. Skipped for visitors who prefer reduced motion. */
 export function useSmoothScroll() {
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    const lenis = new Lenis({ autoRaf: true, anchors: { offset: -80 }, lerp: 0.1 })
-    return () => lenis.destroy()
+    lenis = new Lenis({ autoRaf: true, anchors: { offset: -80 }, lerp: 0.1 })
+    return () => {
+      lenis.destroy()
+      lenis = null
+    }
   }, [])
+}
+
+/** Glides back to the top, through Lenis when it is running. */
+export function scrollToTop() {
+  if (lenis) lenis.scrollTo(0, { duration: 1.4 })
+  else window.scrollTo({ top: 0 })
 }
 
 /** Fades in and rises slightly the first time it enters the viewport. */
 export function Reveal({ as = 'div', delay = 0, className, children, ...rest }) {
-  const Tag = motion[as]
+  const Tag = m[as]
   return (
     <Tag
       className={className}
@@ -26,6 +37,39 @@ export function Reveal({ as = 'div', delay = 0, className, children, ...rest }) 
       {...rest}
     >
       {children}
+    </Tag>
+  )
+}
+
+const maskLine = {
+  hidden: { y: '108%', opacity: 0 },
+  show: { y: 0, opacity: 1, transition: { duration: 0.9, ease: EASE } },
+}
+
+/**
+ * Headline whose lines rise out from behind a mask, one after another.
+ * `immediate` plays on page load instead of waiting for scroll.
+ */
+export function MaskLines({ as = 'h2', lines, className, delay = 0, immediate = false }) {
+  const Tag = m[as]
+  const trigger = immediate
+    ? { animate: 'show' }
+    : { whileInView: 'show', viewport: { once: true, margin: '0px 0px -12% 0px' } }
+  return (
+    <Tag
+      className={className}
+      initial="hidden"
+      transition={{ staggerChildren: 0.1, delayChildren: delay }}
+      {...trigger}
+    >
+      {lines.map((line, i) => (
+        // Padding keeps descenders from being cut off by the mask.
+        <span key={i} className="-mb-[0.14em] block overflow-hidden pb-[0.14em]">
+          <m.span className="block" variants={maskLine}>
+            {line}
+          </m.span>
+        </span>
+      ))}
     </Tag>
   )
 }
@@ -74,7 +118,7 @@ export function Magnetic({ strength = 0.3, className, children }) {
   }
 
   return (
-    <motion.div
+    <m.div
       ref={ref}
       className={className}
       style={{ x, y }}
@@ -82,37 +126,38 @@ export function Magnetic({ strength = 0.3, className, children }) {
       onPointerLeave={reset}
     >
       {children}
-    </motion.div>
+    </m.div>
   )
 }
 
 /**
- * Shop photo with a friendly placeholder behind it, so the layout still looks
- * finished until the real file is dropped into /public/images.
+ * Shop photo that fills its container. Give the container an aspect ratio so
+ * nothing shifts while the photo loads. If the file is missing, a hatched
+ * stand-in shows the file name to drop into /public/images.
  */
-export function ShopImage({ src, alt, label, className = '', scaleIn = false, eager = false }) {
+export function ShopImage({ src, alt, className = '', imgClassName = '', tone = 'light', eager = false }) {
   const [failed, setFailed] = useState(false)
   return (
     <div
-      className={`relative overflow-hidden bg-gradient-to-br from-brand-soft via-cream-deep to-accent-soft ${className}`}
+      className={`relative overflow-hidden ${tone === 'dark' ? 'placeholder-dark' : 'placeholder-light'} ${className}`}
     >
-      <div className="absolute inset-0 grid place-items-center p-6 text-center" aria-hidden="true">
-        <span className="rounded-full bg-white/70 px-4 py-2 text-xs font-semibold text-brand">
-          {label}
+      {failed ? (
+        <span
+          aria-hidden="true"
+          className={`absolute right-3 top-3 font-mono text-[0.65rem] uppercase tracking-widest ${
+            tone === 'dark' ? 'hidden' : 'text-ink/70'
+          }`}
+        >
+          Photo: {src.split('/').pop()}
         </span>
-      </div>
-      {!failed && (
-        <motion.img
+      ) : (
+        <img
           src={src}
           alt={alt}
           loading={eager ? 'eager' : 'lazy'}
-          fetchPriority={eager ? 'high' : undefined}
           decoding="async"
           onError={() => setFailed(true)}
-          className="absolute inset-0 h-full w-full object-cover"
-          initial={scaleIn ? { scale: 1.05 } : false}
-          animate={scaleIn ? { scale: 1 } : undefined}
-          transition={{ duration: 1.5, ease: EASE }}
+          className={`absolute inset-0 h-full w-full object-cover ${imgClassName}`}
         />
       )}
     </div>

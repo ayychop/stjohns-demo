@@ -2,28 +2,40 @@
 @import 'lenis/dist/lenis.css';
 
 @theme {
-  --font-sans: 'Plus Jakarta Sans Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-serif: 'Fraunces Variable', 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
 
-  --color-cream: #fbf7ef;
-  --color-cream-deep: #f3ecdf;
-  --color-ink: #16203a;
-  --color-muted: #5b6478;
-  --color-brand: #14317a;
-  --color-brand-dark: #0d2259;
-  --color-brand-soft: #e6ecfa;
-  --color-accent: #d8362f;
-  --color-accent-dark: #b92922;
-  --color-accent-soft: #fde9e6;
-  --color-sun: #f5b93a;
+  --color-ink: #0b1b3d;
+  --color-ink-soft: #16295a;
+  --color-cream: #f5efe4;
+  --color-cream-deep: #e9dcc3;
+  --color-clay: #d2451e;
+  --color-clay-dark: #b03614;
+  --color-mustard: #e8b33d;
 
-  --shadow-soft: 0 1px 2px rgb(22 32 58 / 0.04), 0 8px 24px -8px rgb(22 32 58 / 0.1);
-  --shadow-lift: 0 2px 4px rgb(22 32 58 / 0.04), 0 20px 40px -16px rgb(22 32 58 / 0.18);
-  --shadow-glow: 0 0 0 1px rgb(20 49 122 / 0.14), 0 18px 40px -12px rgb(20 49 122 / 0.35);
+  --shadow-lift: 0 24px 48px -20px rgb(11 27 61 / 0.45);
 }
 
 @layer base {
   html {
     scroll-padding-top: 5rem;
+    scrollbar-color: var(--color-ink) var(--color-cream);
+  }
+
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-cream);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-ink);
+    border: 3px solid var(--color-cream);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-ink-soft);
   }
 
   body {
@@ -34,14 +46,132 @@
     text-rendering: optimizeLegibility;
   }
 
+  /* Paper grain over the whole site. A small tiled SVG, so it is rasterised once. */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    opacity: 0.16;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 220px 220px;
+  }
+
   :focus-visible {
-    outline: 3px solid var(--color-sun);
+    outline: 3px solid var(--color-mustard);
     outline-offset: 3px;
-    border-radius: 0.5rem;
   }
 
   ::selection {
-    background: var(--color-brand);
+    background: var(--color-clay);
     color: var(--color-cream);
+  }
+}
+
+@layer components {
+  .font-display {
+    font-family: var(--font-serif);
+    font-optical-sizing: auto;
+    letter-spacing: -0.02em;
+  }
+
+  /* The red-and-cream awning stripe from the shop front. */
+  .awning {
+    background-image: repeating-linear-gradient(
+      90deg,
+      var(--color-clay) 0 28px,
+      var(--color-cream) 28px 56px
+    );
+  }
+
+  /* Stand-ins shown until the real photos are dropped into /public/images. */
+  .placeholder-light {
+    background-color: var(--color-cream-deep);
+    background-image: repeating-linear-gradient(
+      135deg,
+      rgb(11 27 61 / 0.07) 0 2px,
+      transparent 2px 14px
+    );
+  }
+
+  .placeholder-dark {
+    background-color: var(--color-ink);
+    background-image:
+      radial-gradient(90% 70% at 85% 100%, rgb(210 69 30 / 0.5), transparent 70%),
+      radial-gradient(60% 50% at 10% 0%, rgb(232 179 61 / 0.16), transparent 70%),
+      repeating-linear-gradient(135deg, rgb(245 239 228 / 0.04) 0 2px, transparent 2px 14px);
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Slow cinematic drift on the hero photo: 100% to 105% and back, forever. */
+  .kenburns {
+    animation: kenburns 20s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+
+  /* Polaroid strip. The track holds two identical runs, so sliding it by half loops seamlessly. */
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee 80s linear infinite;
+  }
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
+
+  /* Long-form copy on the Privacy and Terms pages. */
+  .legal h2 {
+    font-family: var(--font-serif);
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-top: 2.75rem;
+  }
+  .legal p,
+  .legal ul {
+    margin-top: 1rem;
+    line-height: 1.7;
+  }
+  .legal ul {
+    list-style: disc;
+    padding-left: 1.25rem;
+  }
+  .legal a {
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .legal a:hover {
+    color: var(--color-clay-dark);
+  }
+}
+
+@keyframes kenburns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kenburns,
+  .marquee-track {
+    animation: none;
   }
 }
