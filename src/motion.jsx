@@ -24,13 +24,16 @@ export function scrollToTop() {
   else window.scrollTo({ top: 0 })
 }
 
-/** Fades in and rises slightly the first time it enters the viewport. */
+/**
+ * Fades in and rises slightly the first time it enters the viewport.
+ * `once: true` means it never plays again, however much the page is scrolled.
+ */
 export function Reveal({ as = 'div', delay = 0, className, children, ...rest }) {
   const Tag = m[as]
   return (
     <Tag
       className={className}
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '0px 0px -10% 0px' }}
       transition={{ duration: 0.7, delay, ease: EASE }}
@@ -41,53 +44,33 @@ export function Reveal({ as = 'div', delay = 0, className, children, ...rest }) 
   )
 }
 
-const maskLine = {
-  hidden: { y: '108%', opacity: 0 },
-  show: { y: 0, opacity: 1, transition: { duration: 0.9, ease: EASE } },
-}
-
 /**
- * Headline whose lines rise out from behind a mask, one after another.
- * `immediate` plays on page load instead of waiting for scroll.
+ * Counts up from 0 the first time it scrolls into view, then stays put.
+ * Once it has finished it is locked: nothing re-runs it.
  */
-export function MaskLines({ as = 'h2', lines, className, delay = 0, immediate = false }) {
-  const Tag = m[as]
-  const trigger = immediate
-    ? { animate: 'show' }
-    : { whileInView: 'show', viewport: { once: true, margin: '0px 0px -12% 0px' } }
-  return (
-    <Tag
-      className={className}
-      initial="hidden"
-      transition={{ staggerChildren: 0.1, delayChildren: delay }}
-      {...trigger}
-    >
-      {lines.map((line, i) => (
-        // Padding keeps descenders from being cut off by the mask.
-        <span key={i} className="-mb-[0.14em] block overflow-hidden pb-[0.14em]">
-          <m.span className="block" variants={maskLine}>
-            {line}
-          </m.span>
-        </span>
-      ))}
-    </Tag>
-  )
-}
-
-/** Counts up from 0 once, when scrolled into view. */
 export function Counter({ to, decimals = 0, duration = 1.1 }) {
   const ref = useRef(null)
+  const finished = useRef(false)
   const inView = useInView(ref, { once: true })
   const reduced = useReducedMotion()
   const [value, setValue] = useState(0)
 
   useEffect(() => {
-    if (!inView) return
+    if (!inView || finished.current) return
     if (reduced) {
+      finished.current = true
       setValue(to)
       return
     }
-    const controls = animate(0, to, { duration, ease: 'easeOut', onUpdate: setValue })
+    const controls = animate(0, to, {
+      duration,
+      ease: 'easeOut',
+      onUpdate: setValue,
+      onComplete: () => {
+        finished.current = true
+        setValue(to)
+      },
+    })
     return () => controls.stop()
   }, [inView, reduced, to, duration])
 
@@ -118,48 +101,8 @@ export function Magnetic({ strength = 0.3, className, children }) {
   }
 
   return (
-    <m.div
-      ref={ref}
-      className={className}
-      style={{ x, y }}
-      onPointerMove={onPointerMove}
-      onPointerLeave={reset}
-    >
+    <m.div ref={ref} className={className} style={{ x, y }} onPointerMove={onPointerMove} onPointerLeave={reset}>
       {children}
     </m.div>
-  )
-}
-
-/**
- * Shop photo that fills its container. Give the container an aspect ratio so
- * nothing shifts while the photo loads. If the file is missing, a hatched
- * stand-in shows the file name to drop into /public/images.
- */
-export function ShopImage({ src, alt, className = '', imgClassName = '', tone = 'light', eager = false }) {
-  const [failed, setFailed] = useState(false)
-  return (
-    <div
-      className={`relative overflow-hidden ${tone === 'dark' ? 'placeholder-dark' : 'placeholder-light'} ${className}`}
-    >
-      {failed ? (
-        <span
-          aria-hidden="true"
-          className={`absolute right-3 top-3 font-mono text-[0.65rem] uppercase tracking-widest ${
-            tone === 'dark' ? 'hidden' : 'text-ink/70'
-          }`}
-        >
-          Photo: {src.split('/').pop()}
-        </span>
-      ) : (
-        <img
-          src={src}
-          alt={alt}
-          loading={eager ? 'eager' : 'lazy'}
-          decoding="async"
-          onError={() => setFailed(true)}
-          className={`absolute inset-0 h-full w-full object-cover ${imgClassName}`}
-        />
-      )}
-    </div>
   )
 }

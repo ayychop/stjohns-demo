@@ -1,41 +1,28 @@
 @import 'tailwindcss';
 @import 'lenis/dist/lenis.css';
 
+/*
+  The whole palette comes from the shop's logo. These five colours are the only
+  ones used on the site; lighter and darker shades are made with opacity.
+*/
 @theme {
   --font-serif: 'Fraunces Variable', 'Playfair Display', Georgia, 'Times New Roman', serif;
   --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
 
-  --color-ink: #0b1b3d;
-  --color-ink-soft: #16295a;
-  --color-cream: #f5efe4;
-  --color-cream-deep: #e9dcc3;
-  --color-clay: #d2451e;
-  --color-mustard: #e8b33d;
-  --color-saffron: #f2a93b;
-  /* The deep red of "FOOD" in the shop's logo. */
-  --color-carnival: #8b1a24;
-  /* Hover and pressed state for terracotta buttons and links. */
-  --color-clay-dark: #8b1a24;
-  /* The cream-gold of the logo's lettering, for hairlines, small print and hovers. */
-  --color-parchment: #e8d9b0;
-  /* The bright blue of the shop sign: the header bar, plus the odd dot. Nowhere else. */
-  --color-sign: #2da4dc;
-  /* The same blue, deepened so it stays readable as small text on white. */
-  --color-sign-ink: #17709f;
-  --color-forest: #2e5a3b;
-  --color-burgundy: #3a1414;
-  --color-plum: #4a1d24;
-  --color-ember: #7a2e1e;
-  --color-char: #1a0f0c;
+  --color-blue: #5fb4e0; /* baby blue: the logo's background, the main brand colour */
+  --color-cream: #f5efe0; /* main page background */
+  --color-burgundy: #6b1e2e; /* the wine and grapes: buttons and accents */
+  --color-navy: #1a2340; /* text */
+  --color-offwhite: #faf7f0; /* secondary backgrounds and cards */
 
-  /* Shadows are warm brown, never cold black. */
-  --shadow-lift: 0 24px 48px -20px rgb(26 15 12 / 0.5);
+  --shadow-soft: 0 1px 2px rgb(26 35 64 / 0.05), 0 12px 28px -16px rgb(26 35 64 / 0.28);
+  --shadow-lift: 0 2px 4px rgb(26 35 64 / 0.06), 0 22px 44px -20px rgb(26 35 64 / 0.4);
 }
 
 @layer base {
   html {
     scroll-padding-top: 5rem;
-    scrollbar-color: var(--color-ink) var(--color-cream);
+    scrollbar-color: var(--color-navy) var(--color-cream);
   }
 
   ::-webkit-scrollbar {
@@ -46,41 +33,28 @@
     background: var(--color-cream);
   }
   ::-webkit-scrollbar-thumb {
-    background: var(--color-ink);
+    background: var(--color-navy);
     border: 3px solid var(--color-cream);
     border-radius: 999px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--color-ink-soft);
   }
 
   body {
     background-color: var(--color-cream);
-    color: var(--color-ink);
+    color: var(--color-navy);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
 
-  /* Paper grain over the whole site. A small tiled SVG, so it is rasterised once. */
-  body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    z-index: 60;
-    pointer-events: none;
-    opacity: 0.16;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    background-size: 220px 220px;
-  }
-
+  /* Two-tone ring so keyboard focus shows on blue, cream, burgundy and navy alike. */
   :focus-visible {
-    outline: 3px solid var(--color-mustard);
-    outline-offset: 3px;
+    outline: 2px solid var(--color-navy);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 5px var(--color-offwhite);
   }
 
   ::selection {
-    background: var(--color-clay);
+    background: var(--color-burgundy);
     color: var(--color-cream);
   }
 }
@@ -89,160 +63,66 @@
   .font-display {
     font-family: var(--font-serif);
     font-optical-sizing: auto;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.015em;
   }
 
-  /* The red-and-cream awning stripe from the shop front. */
-  .awning {
-    background-image: repeating-linear-gradient(
-      90deg,
-      var(--color-clay) 0 28px,
-      var(--color-cream) 28px 56px
-    );
+  /* Cream lettering with a hard navy edge, the way the shop sign is painted. */
+  .sign-lettering {
+    color: var(--color-cream);
+    text-shadow:
+      0.035em 0.045em 0 var(--color-navy),
+      0.07em 0.09em 0 rgb(26 35 64 / 0.25);
   }
 
-  /* Stand-ins shown until the real photos are dropped into /public/images. */
-  .placeholder-light {
-    background-color: var(--color-cream-deep);
-    background-image: repeating-linear-gradient(
-      135deg,
-      rgb(11 27 61 / 0.07) 0 2px,
-      transparent 2px 14px
-    );
+  /*
+    African textile texture: a faint weave of zigzags and nested diamonds in
+    the spirit of Ankara and Kente cloth. Put .textile (navy lines, for light
+    backgrounds) or .textile-cream (cream lines, for dark ones) on a section;
+    keep it to one or two places on the site.
+  */
+  .textile,
+  .textile-cream {
+    position: relative;
+    isolation: isolate;
+  }
+  .textile::before,
+  .textile-cream::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    border-radius: inherit;
+    background-size: 120px 120px;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' fill='none' stroke='%231A2340' stroke-width='2'%3E%3Cpath d='M0 12 10 2 20 12 30 2 40 12 50 2 60 12 70 2 80 12 90 2 100 12 110 2 120 12M0 24H120M0 96H120M0 108l10 10 10-10 10 10 10-10 10 10 10-10 10 10 10-10 10 10 10-10 10 10 10-10M60 34 86 60 60 86 34 60ZM60 46 74 60 60 74 46 60ZM0 44 16 60 0 76M120 44 104 60 120 76'/%3E%3Ccircle cx='60' cy='60' r='3' fill='%231A2340'/%3E%3C/svg%3E");
+  }
+  .textile-cream::before {
+    opacity: 0.07;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' fill='none' stroke='%23F5EFE0' stroke-width='2'%3E%3Cpath d='M0 12 10 2 20 12 30 2 40 12 50 2 60 12 70 2 80 12 90 2 100 12 110 2 120 12M0 24H120M0 96H120M0 108l10 10 10-10 10 10 10-10 10 10 10-10 10 10 10-10 10 10 10-10 10 10 10-10M60 34 86 60 60 86 34 60ZM60 46 74 60 60 74 46 60ZM0 44 16 60 0 76M120 44 104 60 120 76'/%3E%3Ccircle cx='60' cy='60' r='3' fill='%23F5EFE0'/%3E%3C/svg%3E");
   }
 
-  .placeholder-dark {
-    background-color: var(--color-burgundy);
-    background-image: repeating-linear-gradient(135deg, rgb(245 239 228 / 0.04) 0 2px, transparent 2px 14px);
+  /* Scalloped awning edge: a row of baby-blue half circles hanging off the hero. */
+  .scallop {
+    height: 14px;
+    background: radial-gradient(circle at 14px 0, var(--color-blue) 13.5px, transparent 14px) 0 0 / 28px 14px
+      repeat-x;
   }
 
-  /* Harlesden dusk: plum sky, terracotta glow, warm charcoal ground. */
-  .dusk {
-    background: linear-gradient(180deg, var(--color-plum) 0%, var(--color-ember) 38%, var(--color-char) 100%);
-  }
-  /* The same sky as a veil over the hero photo, so the photo shows through warm. */
-  .dusk-veil {
-    background: linear-gradient(
-      180deg,
-      rgb(74 29 36 / 0.86) 0%,
-      rgb(122 46 30 / 0.72) 38%,
-      rgb(26 15 12 / 0.95) 100%
-    );
-  }
-  .dusk-footer {
-    background: linear-gradient(180deg, var(--color-plum) 0%, var(--color-burgundy) 45%, var(--color-char) 100%);
-  }
-  /* Low sun behind the headline. */
-  .sun-glow {
-    background: radial-gradient(
-      closest-side,
-      rgb(242 169 59 / 0.26),
-      rgb(210 69 30 / 0.14) 48%,
-      transparent
-    );
-    filter: blur(40px);
-  }
-  /* A second, coarser grain for the hero only. */
-  .grain-coarse {
-    opacity: 0.06;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.45' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    background-size: 300px 300px;
-  }
-
-  /* Hairline border that drifts between terracotta and saffron. Wrap the pill in it with 1px of padding. */
-  .alive-border {
-    padding: 1px;
-    background: linear-gradient(
-        90deg,
-        var(--color-clay),
-        var(--color-saffron),
-        var(--color-clay),
-        var(--color-saffron),
-        var(--color-clay)
-      )
-      0 0 / 200% 100%;
-    animation: border-shift 6s linear infinite;
-  }
-
-  /* Thin carnival ribbon used as a divider between some sections. */
-  .carnival-stripe {
-    height: 3px;
-    background-image: repeating-linear-gradient(
-      135deg,
-      var(--color-clay) 0 12px,
-      var(--color-saffron) 12px 24px,
-      var(--color-forest) 24px 36px
-    );
-  }
-
-  /* Warm cream at the top deepening towards terracotta at the bottom. */
-  .cream-to-clay {
-    background-image: linear-gradient(
-      180deg,
-      rgb(242 169 59 / 0.1) 0%,
-      rgb(232 217 176 / 0.35) 40%,
-      rgb(210 69 30 / 0.2) 100%
-    );
-  }
-
-  /* Polaroid colour washes: a muted carnival colour with warm light catching the top corner. */
-  .wash {
-    background-image:
-      radial-gradient(120% 95% at 0% 0%, rgb(255 226 178 / 0.6), transparent 58%),
-      linear-gradient(160deg, var(--wash-a), var(--wash-b));
-  }
-  .wash-red {
-    --wash-a: #a3272a;
-    --wash-b: #6a1417;
-  }
-  .wash-saffron {
-    --wash-a: #e2a33f;
-    --wash-b: #b87720;
-  }
-  .wash-clay {
-    --wash-a: #c9552f;
-    --wash-b: #8f351b;
-  }
-  .wash-forest {
-    --wash-a: #3b6b49;
-    --wash-b: #1f4029;
-  }
-  .wash-purple {
-    --wash-a: #5b3260;
-    --wash-b: #341b39;
-  }
-
-  .no-scrollbar {
-    scrollbar-width: none;
-  }
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* Slow cinematic drift on the hero photo: 100% to 105% and back, forever. */
+  /* Slow drift on the hero photo, when there is one. */
   .kenburns {
     animation: kenburns 20s ease-in-out infinite alternate;
     will-change: transform;
   }
 
-  /* Polaroid strip. The track holds four identical runs, so sliding it by a quarter loops seamlessly. */
-  .marquee-track {
-    display: flex;
-    width: max-content;
-    animation: marquee 70s linear infinite;
-  }
-  .marquee:hover .marquee-track {
-    animation-play-state: paused;
-  }
-
   /* Long-form copy on the Privacy and Terms pages. */
   .legal h2 {
     font-family: var(--font-serif);
-    font-size: 1.75rem;
-    font-weight: 700;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-    margin-top: 2.75rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    margin-top: 2.5rem;
   }
   .legal p,
   .legal ul {
@@ -255,11 +135,12 @@
   }
   .legal a {
     font-weight: 600;
+    color: var(--color-burgundy);
     text-decoration: underline;
     text-underline-offset: 3px;
   }
   .legal a:hover {
-    color: var(--color-clay-dark);
+    color: var(--color-navy);
   }
 }
 
@@ -272,22 +153,8 @@
   }
 }
 
-@keyframes marquee {
-  to {
-    transform: translateX(-25%);
-  }
-}
-
-@keyframes border-shift {
-  to {
-    background-position: 100% 0;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .kenburns,
-  .marquee-track,
-  .alive-border {
+  .kenburns {
     animation: none;
   }
 }

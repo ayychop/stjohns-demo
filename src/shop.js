@@ -17,10 +17,15 @@ export const SHOP = {
   mapEmbed: 'https://www.google.com/maps?q=90+St.+Johns+Ave%2C+London+NW10+4EG&z=16&output=embed',
 }
 
-export const WRAP = 'mx-auto max-w-7xl px-5 sm:px-8'
-export const btn =
-  'inline-flex min-h-12 items-center justify-center gap-2.5 rounded-[3px] text-sm font-bold uppercase tracking-[0.08em] transition-colors duration-200'
-export const eyebrow = 'flex items-center gap-3 text-xs font-bold uppercase tracking-[0.22em]'
+export const WRAP = 'mx-auto max-w-6xl px-5 sm:px-8'
+const btn =
+  'inline-flex min-h-12 items-center justify-center gap-2.5 rounded-full px-7 text-[0.95rem] font-bold transition-colors duration-200'
+// Burgundy is the call-to-action colour everywhere; it deepens to navy on hover.
+export const btnPrimary = `${btn} bg-burgundy text-cream hover:bg-navy`
+export const btnOutline = `${btn} border-2 border-navy text-navy hover:bg-navy hover:text-cream`
+export const eyebrow = 'text-xs font-bold uppercase tracking-[0.2em] text-burgundy'
+// Section headings are deliberately calm: sentence case, medium size.
+export const heading = 'font-display text-[clamp(1.75rem,4.2vw,2.75rem)] font-semibold leading-[1.1]'
 
 // The preloader stays up until 800ms after the page started loading. On a slow
 // connection that moment has already passed by the time the app arrives, so

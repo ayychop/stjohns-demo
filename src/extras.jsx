@@ -1,155 +1,8 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, m } from 'framer-motion'
-import { ArrowUp, MessageCircle, Navigation, Phone, Plus, Star } from 'lucide-react'
-import { Counter, MaskLines, Reveal, scrollToTop } from './motion.jsx'
-import { SHOP, WRAP, btn, eyebrow } from './shop.js'
-
-// Captions are in the sign's blue, like biro on a real polaroid.
-// Each polaroid is a carnival colour wash with a shop photo printed into it,
-// like a tinted print. To show the photos in full colour instead, remove
-// `mix-blend-luminosity opacity-55` from the image below.
-const POLAROIDS = [
-  { src: '/images/shop-front.jpg', caption: 'Out front', wash: 'wash-red', tilt: -4, drop: 6 },
-  { src: '/images/produce.jpg', caption: 'Fresh in today', wash: 'wash-saffron', tilt: 3, drop: -4 },
-  { src: '/images/aisle.jpg', caption: 'A taste of home', wash: 'wash-clay', tilt: -2, drop: 10 },
-  { src: '/images/produce.jpg', caption: 'Plantain, yam, green banana', wash: 'wash-forest', tilt: 5, drop: 0 },
-  { src: '/images/aisle.jpg', caption: 'Polish shelf', wash: 'wash-purple', tilt: -3, drop: -6 },
-  { src: '/images/shop-front.jpg', caption: 'Harlesden, NW10', wash: 'wash-saffron', tilt: 2, drop: 8 },
-  { src: '/images/aisle.jpg', caption: 'Aisle by aisle', wash: 'wash-red', tilt: -5, drop: 2 },
-  { src: '/images/produce.jpg', caption: 'Picked this morning', wash: 'wash-clay', tilt: 4, drop: -2 },
-]
-
-/** Slow strip of tilted, overlapping polaroids that hangs off the bottom of the hero. */
-export function PolaroidMarquee() {
-  return (
-    <div aria-hidden="true" className="marquee relative z-10 -mt-20 overflow-x-clip pb-6 sm:-mt-24">
-      <div className="marquee-track">
-        {/* Four identical runs: the track slides by exactly one run, then repeats. */}
-        {[...POLAROIDS, ...POLAROIDS, ...POLAROIDS, ...POLAROIDS].map((photo, i) => (
-          <figure
-            key={i}
-            style={{ transform: `translateY(${photo.drop}px) rotate(${photo.tilt}deg)` }}
-            className="-mr-3 w-36 shrink-0 bg-white p-2 pb-2.5 shadow-[0_16px_32px_-12px_rgb(26_15_12/0.6)] sm:w-48 sm:p-2.5"
-          >
-            <div className={`wash ${photo.wash} relative aspect-square w-full overflow-hidden`}>
-              <img
-                src={photo.src}
-                alt=""
-                loading="lazy"
-                decoding="async"
-                className="absolute inset-0 h-full w-full object-cover opacity-55 mix-blend-luminosity"
-              />
-            </div>
-            <figcaption className="font-display mt-2 truncate text-center text-sm italic text-sign-ink sm:text-base">
-              {photo.caption}
-            </figcaption>
-          </figure>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-// PLACEHOLDER REVIEWS: these are sample quotes, not real customers. Replace
-// them with genuine Google reviews (quote and name), then set `sample: false`
-// to remove the "Sample review" tag. Do not publish invented reviews as real.
-const REVIEWS = [
-  {
-    quote:
-      'Open late, always a friendly hello, and they stock the seasoning I cannot find anywhere else round here. Proper local shop.',
-    name: 'Reviewer name',
-    when: 'Date of review',
-    sample: true,
-  },
-  {
-    quote:
-      'Real Polish bread and pickles on the shelf, which saves me a trip across town. The lads behind the counter always remember you.',
-    name: 'Reviewer name',
-    when: 'Date of review',
-    sample: true,
-  },
-  {
-    quote:
-      'Popped in for milk and came out having paid the gas and topped up my phone as well. Fruit and veg out front is always fresh.',
-    name: 'Reviewer name',
-    when: 'Date of review',
-    sample: true,
-  },
-]
-
-function Stars({ className = 'h-4 w-4' }) {
-  return (
-    <span className="flex gap-0.5" role="img" aria-label="5 out of 5 stars">
-      {[0, 1, 2, 3, 4].map((i) => (
-        <Star key={i} className={`${className} fill-mustard text-mustard`} aria-hidden="true" />
-      ))}
-    </span>
-  )
-}
-
-export function Reviews() {
-  return (
-    <section id="reviews" className="py-20 sm:py-28">
-      <div className={WRAP}>
-        <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-6">
-          <div>
-            <Reveal as="p" className={eyebrow}>
-              <span className="h-0.5 w-8 bg-clay" aria-hidden="true" />
-              Word on the street
-            </Reveal>
-            <MaskLines
-              lines={['What the', 'neighbourhood says']}
-              className="font-display mt-5 text-[clamp(1.9rem,8vw,5.5rem)] font-black uppercase leading-[0.92]"
-            />
-          </div>
-          <Reveal className="mb-2 flex items-center gap-3 border-2 border-ink px-4 py-3">
-            <Star className="h-6 w-6 fill-mustard text-mustard" aria-hidden="true" />
-            <p className="text-sm font-bold uppercase tracking-[0.08em]">
-              <Counter to={SHOP.rating} decimals={1} /> on Google ·{' '}
-              <Counter to={SHOP.reviewCount} /> reviews
-            </p>
-          </Reveal>
-        </div>
-
-        <ul className="mt-12 grid gap-6 md:grid-cols-3 lg:gap-8">
-          {REVIEWS.map((review, i) => (
-            <Reveal as="li" key={i} delay={i * 0.08} className={i === 1 ? 'md:mt-10' : ''}>
-              <m.figure
-                whileHover={{ y: -6 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-                className="relative h-full border border-ink/20 bg-white/60 p-6 transition-shadow duration-300 hover:shadow-lift sm:p-8"
-              >
-                <div className="flex items-center justify-between gap-4">
-                  <Stars />
-                  {review.sample && (
-                    <span className="bg-ink px-2 py-1 font-mono text-[0.65rem] uppercase tracking-[0.16em] text-cream">
-                      Sample review
-                    </span>
-                  )}
-                </div>
-                <blockquote className="font-display mt-5 text-xl font-medium leading-snug sm:text-2xl">
-                  “{review.quote}”
-                </blockquote>
-                <figcaption className="mt-6 flex items-center gap-3 border-t border-ink/20 pt-5">
-                  <span
-                    aria-hidden="true"
-                    className="font-display grid h-10 w-10 place-items-center rounded-full bg-forest text-lg font-bold text-cream"
-                  >
-                    {review.name[0]}
-                  </span>
-                  <span className="text-sm leading-tight">
-                    <span className="block font-bold">{review.name}</span>
-                    <span className="text-ink/75">{review.when} · Google</span>
-                  </span>
-                </figcaption>
-              </m.figure>
-            </Reveal>
-          ))}
-        </ul>
-      </div>
-    </section>
-  )
-}
+import { ArrowUp, MessageCircle, Navigation, Phone, Plus } from 'lucide-react'
+import { Reveal, scrollToTop } from './motion.jsx'
+import { SHOP, WRAP, btnOutline, btnPrimary, eyebrow, heading } from './shop.js'
 
 const FAQS = [
   {
@@ -177,35 +30,33 @@ const FAQS = [
 export function Faq() {
   const [openIndex, setOpenIndex] = useState(0)
   return (
-    <section id="faq">
-      <div aria-hidden="true" className="carnival-stripe" />
-      <div className={`${WRAP} grid gap-10 py-20 sm:py-28 lg:grid-cols-12 lg:gap-14`}>
-        <div className="lg:col-span-5">
-          <Reveal as="p" className={eyebrow}>
-            <span className="h-0.5 w-8 bg-clay" aria-hidden="true" />
-            Before you pop in
-          </Reveal>
-          <MaskLines
-            lines={['The questions', 'we always get']}
-            className="font-display mt-5 text-[clamp(1.9rem,8vw,4.5rem)] font-black uppercase leading-[0.92]"
-          />
-          <Reveal as="p" delay={0.1} className="mt-6 max-w-sm leading-relaxed text-ink/75">
+    <section id="faq" className="bg-cream py-16 sm:py-24">
+      <div className={`${WRAP} grid gap-10 lg:grid-cols-12 lg:gap-14`}>
+        <Reveal className="lg:col-span-4">
+          <p className={eyebrow}>Before you pop in</p>
+          <h2 className={`${heading} mt-3`}>The questions we always get</h2>
+          <p className="mt-4 max-w-sm leading-relaxed text-navy/75">
             Something else on your mind? Ask at the counter, or give us a ring on{' '}
             <a
               href={SHOP.tel}
-              className="font-bold text-ink underline decoration-clay decoration-2 underline-offset-4 hover:text-clay-dark"
+              className="font-bold text-burgundy underline underline-offset-4 transition-colors hover:text-navy"
             >
               {SHOP.phone}
             </a>
             .
-          </Reveal>
-        </div>
+          </p>
+        </Reveal>
 
-        <Reveal as="ul" className="border-t-2 border-ink lg:col-span-7">
+        <Reveal as="ul" className="space-y-3 lg:col-span-8">
           {FAQS.map((faq, i) => {
             const open = openIndex === i
             return (
-              <li key={faq.q} className="border-b border-ink/25">
+              <li
+                key={faq.q}
+                className={`rounded-2xl border bg-offwhite transition-colors duration-300 ${
+                  open ? 'border-burgundy/40' : 'border-navy/10 hover:border-navy/30'
+                }`}
+              >
                 <h3>
                   <button
                     type="button"
@@ -213,15 +64,17 @@ export function Faq() {
                     aria-expanded={open}
                     aria-controls={`faq-a-${i}`}
                     onClick={() => setOpenIndex(open ? -1 : i)}
-                    className="font-display group flex w-full cursor-pointer items-center justify-between gap-6 py-5 text-left text-2xl font-bold leading-tight transition-colors hover:text-clay-dark sm:py-6 sm:text-3xl"
+                    className="font-display group flex w-full cursor-pointer items-center justify-between gap-5 rounded-2xl px-5 py-4 text-left text-lg font-semibold leading-snug sm:px-6 sm:py-5 sm:text-xl"
                   >
                     {faq.q}
                     <span
-                      className={`grid h-10 w-10 shrink-0 place-items-center rounded-full border-2 border-ink transition-all duration-300 group-hover:border-clay-dark ${
-                        open ? 'rotate-45 bg-ink text-cream' : ''
+                      className={`grid h-9 w-9 shrink-0 place-items-center rounded-full transition-all duration-300 ${
+                        open
+                          ? 'rotate-45 bg-burgundy text-cream'
+                          : 'bg-navy/5 text-navy group-hover:bg-burgundy group-hover:text-cream'
                       }`}
                     >
-                      <Plus className="h-5 w-5" aria-hidden="true" />
+                      <Plus className="h-4 w-4" aria-hidden="true" />
                     </span>
                   </button>
                 </h3>
@@ -237,7 +90,7 @@ export function Faq() {
                       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
                       className="overflow-hidden"
                     >
-                      <p className="max-w-xl pb-6 pr-12 text-lg leading-relaxed text-ink/80">{faq.a}</p>
+                      <p className="max-w-2xl px-5 pb-5 leading-relaxed text-navy/80 sm:px-6 sm:pb-6">{faq.a}</p>
                     </m.div>
                   )}
                 </AnimatePresence>
@@ -261,18 +114,13 @@ export function MobileBar({ show }) {
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
           transition={{ duration: 0.3, ease: 'easeOut' }}
-          className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-2 gap-2.5 border-t-2 border-ink bg-cream p-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom))] md:hidden"
+          className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-2 gap-2.5 border-t border-navy/15 bg-offwhite p-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom))] shadow-lift md:hidden"
         >
-          <a href={SHOP.tel} className={`${btn} bg-clay text-white active:bg-clay-dark`}>
+          <a href={SHOP.tel} className={`${btnPrimary} !px-4`}>
             <Phone className="h-4 w-4" aria-hidden="true" />
             Call Now
           </a>
-          <a
-            href={SHOP.directions}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`${btn} border-2 border-ink text-ink active:bg-ink active:text-cream`}
-          >
+          <a href={SHOP.directions} target="_blank" rel="noopener noreferrer" className={`${btnOutline} !px-4`}>
             <Navigation className="h-4 w-4" aria-hidden="true" />
             Directions
           </a>
@@ -305,9 +153,9 @@ export function FloatingActions({ show }) {
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Message us on WhatsApp"
-          className={`${fab} left-4 bg-[#25d366] text-ink hover:bg-[#1fb857] md:left-auto md:right-[5.5rem]`}
+          className={`${fab} left-4 border-2 border-cream bg-burgundy text-cream hover:bg-navy md:left-auto md:right-[5.5rem]`}
         >
-          <MessageCircle className="h-6 w-6" strokeWidth={2.2} aria-hidden="true" />
+          <MessageCircle className="h-6 w-6" aria-hidden="true" />
         </m.a>
       )}
       {show && (
@@ -317,7 +165,7 @@ export function FloatingActions({ show }) {
           type="button"
           onClick={scrollToTop}
           aria-label="Back to top"
-          className={`${fab} right-4 border-2 border-cream bg-burgundy text-cream hover:bg-clay md:right-6`}
+          className={`${fab} right-4 border-2 border-cream bg-navy text-cream hover:bg-burgundy md:right-6`}
         >
           <ArrowUp className="h-6 w-6" aria-hidden="true" />
         </m.button>
@@ -346,12 +194,15 @@ export function CookieBanner({ consent, setConsent }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 24 }}
             transition={{ duration: 0.35 }}
-            className="pointer-events-auto flex w-full max-w-3xl flex-col gap-3 border-2 border-ink bg-cream p-3 shadow-lift md:flex-row md:items-center md:gap-6 md:px-5 md:py-3"
+            className="pointer-events-auto flex w-full max-w-3xl flex-col gap-3 rounded-2xl border border-navy/15 bg-offwhite p-3.5 shadow-lift md:flex-row md:items-center md:gap-6 md:px-5"
           >
             <p className="text-[0.8rem] leading-snug md:flex-1 md:text-sm">
               <strong>We use cookies.</strong> Only for the Google map, and only if you say yes. See
               our{' '}
-              <a href="/privacy.html" className="font-bold underline underline-offset-2 hover:text-clay-dark">
+              <a
+                href="/privacy.html"
+                className="font-bold text-burgundy underline underline-offset-2 hover:text-navy"
+              >
                 privacy policy
               </a>
               .
@@ -360,14 +211,14 @@ export function CookieBanner({ consent, setConsent }) {
               <button
                 type="button"
                 onClick={() => setConsent('accepted')}
-                className={`${btn} !min-h-11 flex-1 cursor-pointer bg-clay px-6 text-white hover:bg-clay-dark`}
+                className={`${btnPrimary} !min-h-11 flex-1 cursor-pointer !px-6`}
               >
                 Accept
               </button>
               <button
                 type="button"
                 onClick={() => setConsent('declined')}
-                className={`${btn} !min-h-11 flex-1 cursor-pointer whitespace-nowrap border-2 border-ink px-6 hover:bg-ink hover:text-cream`}
+                className={`${btnOutline} !min-h-11 flex-1 cursor-pointer whitespace-nowrap !px-6`}
               >
                 No thanks
               </button>
