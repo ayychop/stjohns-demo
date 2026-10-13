@@ -13,11 +13,12 @@ createRoot(document.getElementById('root')).render(
   </StrictMode>,
 )
 
-// Hold the preloader for its beat, fade it out, then take it out of the page.
+// Hold the loading screen for its minimum time, fade it out, then take it out of the page.
 const preloader = document.getElementById('preloader')
 if (preloader) {
   setTimeout(() => {
     preloader.classList.add('done')
-    setTimeout(() => preloader.remove(), 600)
+    // The fade takes 0.6s; remove the element just after it finishes.
+    setTimeout(() => preloader.remove(), 700)
   }, PRELOADER_MS)
 }

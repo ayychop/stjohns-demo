@@ -74,34 +74,6 @@
       0.07em 0.09em 0 rgb(26 35 64 / 0.25);
   }
 
-  /*
-    African textile texture: a faint weave of zigzags and nested diamonds in
-    the spirit of Ankara and Kente cloth. Put .textile (navy lines, for light
-    backgrounds) or .textile-cream (cream lines, for dark ones) on a section;
-    keep it to one or two places on the site.
-  */
-  .textile,
-  .textile-cream {
-    position: relative;
-    isolation: isolate;
-  }
-  .textile::before,
-  .textile-cream::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    border-radius: inherit;
-    background-size: 120px 120px;
-    opacity: 0.05;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' fill='none' stroke='%231A2340' stroke-width='2'%3E%3Cpath d='M0 12 10 2 20 12 30 2 40 12 50 2 60 12 70 2 80 12 90 2 100 12 110 2 120 12M0 24H120M0 96H120M0 108l10 10 10-10 10 10 10-10 10 10 10-10 10 10 10-10 10 10 10-10 10 10 10-10M60 34 86 60 60 86 34 60ZM60 46 74 60 60 74 46 60ZM0 44 16 60 0 76M120 44 104 60 120 76'/%3E%3Ccircle cx='60' cy='60' r='3' fill='%231A2340'/%3E%3C/svg%3E");
-  }
-  .textile-cream::before {
-    opacity: 0.07;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' fill='none' stroke='%23F5EFE0' stroke-width='2'%3E%3Cpath d='M0 12 10 2 20 12 30 2 40 12 50 2 60 12 70 2 80 12 90 2 100 12 110 2 120 12M0 24H120M0 96H120M0 108l10 10 10-10 10 10 10-10 10 10 10-10 10 10 10-10 10 10 10-10 10 10 10-10M60 34 86 60 60 86 34 60ZM60 46 74 60 60 74 46 60ZM0 44 16 60 0 76M120 44 104 60 120 76'/%3E%3Ccircle cx='60' cy='60' r='3' fill='%23F5EFE0'/%3E%3C/svg%3E");
-  }
-
   /* Scalloped awning edge: a row of baby-blue half circles hanging off the hero. */
   .scallop {
     height: 14px;

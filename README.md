@@ -26,16 +26,17 @@ npm run images   # shrink the photos in public/images to web sizes
 
 The palette is five colours taken from the logo, defined once in `src/index.css`:
 baby blue, cream, burgundy, navy and warm off-white. Nothing else is used.
-Two motifs tie the pages together: the grape line drawings in `src/brand.jsx`,
-and the faint African textile weave (`.textile` in `src/index.css`), which is
-deliberately limited to two places.
+Two motifs tie the pages together, both in `src/brand.jsx`: the grape line
+drawings, and `KentePattern`, a faint texture that borrows the geometry of
+Ghanaian Kente cloth in the shop's own colours. The pattern is deliberately
+limited to two places: the band under the hero and behind What We Sell.
 
 ## Where things live
 
 - `index.html`: meta tags, LocalBusiness schema, preloader.
 - `src/shop.js`: shop details (phone, address, hours), shared button and heading styles, the open/closed clock and the cookie choice.
-- `src/brand.jsx`: the logo (with its text fallback) and the grape illustrations.
+- `src/brand.jsx`: the logo (with its text fallback), the grape illustrations and the Kente pattern.
 - `src/App.jsx`: the main page sections.
 - `src/extras.jsx`: FAQ, cookie banner, mobile bar and floating buttons.
 - `src/motion.jsx`: shared animation helpers.
-- `src/index.css`: colours, fonts, the textile pattern and scalloped edge.
+- `src/index.css`: colours, fonts and the scalloped edge.

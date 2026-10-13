@@ -13,7 +13,7 @@ If `logo.png` is removed, the site shows a text "FOOD & WINE" wordmark instead.
 There are two photo slots. Until a file exists, the site shows a brand colour
 block in its place, so nothing looks broken without them.
 
-- `shop-front.jpg`: appears in the hero, beside the headline. Portrait works best.
+- `shop-front.jpg`: fills the photo block on the right of the hero, replacing the cream block with the grapes. Portrait works best.
 - `aisle.jpg`: appears in Why Shop With Us, replacing the burgundy quote block. Portrait works best.
 
 After adding a photo, run `npm run images` to shrink it for the web, then

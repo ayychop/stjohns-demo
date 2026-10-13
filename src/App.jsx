@@ -22,7 +22,7 @@ import {
   Wheat,
   Wine,
 } from 'lucide-react'
-import { GrapeCluster, IMAGES, Logo, VineDivider } from './brand.jsx'
+import { GrapeCluster, IMAGES, KentePattern, Logo, VineDivider } from './brand.jsx'
 import { Counter, Magnetic, Reveal, useSmoothScroll } from './motion.jsx'
 import { CookieBanner, Faq, FloatingActions, MobileBar } from './extras.jsx'
 import {
@@ -164,19 +164,15 @@ function Header({ scrolled }) {
 function Hero({ clock }) {
   return (
     <section id="top" className="relative overflow-hidden bg-blue">
-      {/* Without a shop photo, a large line drawing of the logo's grapes fills the corner. */}
+      {/* On phones without a shop photo, the logo's grapes sit quietly in the corner. */}
       {!IMAGES.shopFront && (
         <GrapeCluster
-          strokeWidth={1.6}
-          className="pointer-events-none absolute -right-14 top-16 w-44 rotate-12 text-cream/35 sm:w-64 lg:-right-6 lg:top-24 lg:w-[27rem] lg:text-cream/45"
+          strokeWidth={1.8}
+          className="pointer-events-none absolute -right-12 top-16 w-40 rotate-12 text-burgundy/30 sm:w-56 lg:hidden"
         />
       )}
 
-      <div
-        className={`${WRAP} relative grid items-center gap-12 pb-12 pt-28 sm:pt-36 lg:pb-20 ${
-          IMAGES.shopFront ? 'lg:grid-cols-[1.1fr_0.9fr]' : ''
-        }`}
-      >
+      <div className={`${WRAP} relative grid items-center gap-12 pb-12 pt-28 sm:pt-36 lg:grid-cols-[1.15fr_0.85fr] lg:pb-20`}>
         <div>
           <m.div
             initial={{ opacity: 0, y: -8 }}
@@ -238,19 +234,29 @@ function Hero({ clock }) {
           </m.div>
         </div>
 
-        {IMAGES.shopFront && (
-          <div className="relative mx-auto w-full max-w-md lg:max-w-none">
-            <div aria-hidden="true" className="absolute -bottom-3 -right-3 h-full w-full rounded-[2rem] bg-burgundy" />
-            <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] bg-cream">
+        {/* The photo block on the right. It shows the shop-front photo when there is one;
+            until then it is a cream block carrying the logo's grapes in burgundy
+            (desktop only, so phones are not handed an extra screen of decoration). */}
+        <div className={`relative mx-auto w-full max-w-md ${IMAGES.shopFront ? '' : 'hidden lg:block'}`}>
+          <div aria-hidden="true" className="absolute -bottom-3 -right-3 h-full w-full rounded-[2rem] bg-burgundy" />
+          <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] bg-cream">
+            {IMAGES.shopFront ? (
               <img
                 src="/images/shop-front.jpg"
                 alt="The shop front of St. John's Mini Market"
                 decoding="async"
                 className="kenburns absolute inset-0 h-full w-full object-cover"
               />
-            </div>
+            ) : (
+              <div className="flex h-full flex-col items-center justify-center gap-8 p-10 text-burgundy">
+                <GrapeCluster strokeWidth={2} className="w-[62%]" />
+                <p className="text-center text-xs font-bold uppercase tracking-[0.2em]">
+                  90 St. Johns Ave · Harlesden NW10
+                </p>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </section>
   )
@@ -258,37 +264,45 @@ function Hero({ clock }) {
 
 function WhatWeSell() {
   return (
-    // The faint African textile weave sits behind this section only.
-    <section id="what-we-sell" className="textile bg-cream pb-16 sm:pb-24">
+    <section id="what-we-sell" className="bg-cream">
+      {/* The woven band: a strip of the Kente-inspired pattern running the full width under the hero. */}
       <div aria-hidden="true" className="scallop" />
-      <div className={`${WRAP} pt-14 sm:pt-20`}>
-        <Reveal className="max-w-xl">
-          <p className={eyebrow}>What we sell</p>
-          <h2 className={`${heading} mt-3`}>Everything for the week, and a taste of home</h2>
-          <p className="mt-4 leading-relaxed text-navy/75">
-            Eight good reasons to pop in, and usually a ninth you had forgotten you needed.
-          </p>
-        </Reveal>
+      <div className="relative mt-2 h-[60px] border-y border-burgundy/20 bg-offwhite">
+        <KentePattern opacity={0.08} />
+      </div>
 
-        <ul className="mt-10 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
-          {PRODUCTS.map(({ icon: Icon, label, text }, i) => (
-            <Reveal as="li" key={label} delay={(i % 4) * 0.05}>
-              <m.div
-                whileHover={{ y: -5 }}
-                transition={{ type: 'spring', stiffness: 320, damping: 24 }}
-                className="group h-full rounded-2xl border border-navy/10 bg-offwhite p-4 shadow-soft transition-[border-color,box-shadow] duration-300 hover:border-burgundy/50 hover:shadow-lift sm:p-6"
-              >
-                <Icon
-                  className="h-8 w-8 text-navy transition-colors duration-300 group-hover:text-burgundy"
-                  strokeWidth={1.5}
-                  aria-hidden="true"
-                />
-                <h3 className="font-display mt-5 text-lg font-semibold leading-tight sm:text-xl">{label}</h3>
-                <p className="mt-1.5 text-sm leading-snug text-navy/70">{text}</p>
-              </m.div>
-            </Reveal>
-          ))}
-        </ul>
+      {/* The same pattern, fainter, as a texture behind the section. */}
+      <div className="relative pb-16 sm:pb-24">
+        <KentePattern opacity={0.05} />
+        <div className={`${WRAP} relative pt-14 sm:pt-20`}>
+          <Reveal className="max-w-xl">
+            <p className={eyebrow}>What we sell</p>
+            <h2 className={`${heading} mt-3`}>Everything for the week, and a taste of home</h2>
+            <p className="mt-4 leading-relaxed text-navy/75">
+              Eight good reasons to pop in, and usually a ninth you had forgotten you needed.
+            </p>
+          </Reveal>
+
+          <ul className="mt-10 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
+            {PRODUCTS.map(({ icon: Icon, label, text }, i) => (
+              <Reveal as="li" key={label} delay={(i % 4) * 0.05}>
+                <m.div
+                  whileHover={{ y: -5 }}
+                  transition={{ type: 'spring', stiffness: 320, damping: 24 }}
+                  className="group h-full rounded-2xl border border-navy/10 bg-offwhite p-4 shadow-soft transition-[border-color,box-shadow] duration-300 hover:border-burgundy/50 hover:shadow-lift sm:p-6"
+                >
+                  <Icon
+                    className="h-8 w-8 text-navy transition-colors duration-300 group-hover:text-burgundy"
+                    strokeWidth={1.5}
+                    aria-hidden="true"
+                  />
+                  <h3 className="font-display mt-5 text-lg font-semibold leading-tight sm:text-xl">{label}</h3>
+                  <p className="mt-1.5 text-sm leading-snug text-navy/70">{text}</p>
+                </m.div>
+              </Reveal>
+            ))}
+          </ul>
+        </div>
       </div>
     </section>
   )
@@ -317,7 +331,7 @@ function WhyShop() {
               </div>
             ) : (
               // No photo yet: a solid burgundy block carrying the shop's own words.
-              <figure className="textile-cream rounded-[2rem] bg-burgundy p-8 text-cream sm:p-10">
+              <figure className="rounded-[2rem] bg-burgundy p-8 text-cream sm:p-10">
                 <GrapeCluster className="w-14 text-blue" />
                 <blockquote className="font-display mt-6 text-2xl font-medium italic leading-snug sm:text-[1.75rem]">
                   Caribbean, African, Polish, Irish. Harlesden cooks in a lot of kitchens, and our

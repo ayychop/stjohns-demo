@@ -88,31 +88,65 @@
       }
     </script>
 
-    <!-- Preloader is plain HTML and CSS so it paints before any JavaScript arrives. -->
+    <!--
+      Loading screen. It is plain HTML and CSS, not a React component, so it
+      paints the instant the page arrives instead of waiting for the JavaScript.
+      src/main.jsx fades it out once the app is ready and it has had its time.
+    -->
     <style>
       #preloader {
         position: fixed;
         inset: 0;
         z-index: 100;
-        display: grid;
-        place-items: center;
-        background: #5fb4e0;
-        color: #1a2340;
-        font: 900 clamp(2.5rem, 12vw, 8.5rem) / 0.98 'Fraunces Variable', Georgia, 'Times New Roman', serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3.75rem; /* room for the shop's corners as it turns */
+        padding: 1.5rem;
+        background: #f5efe0;
         text-align: center;
-        letter-spacing: -0.02em;
-        transition: opacity 0.5s ease, visibility 0.5s;
+        transition: opacity 0.6s ease, visibility 0.6s;
       }
       #preloader.done {
         opacity: 0;
         visibility: hidden;
+      }
+      #preloader svg {
+        width: min(58vw, 15rem);
+        height: auto;
+        /* One calm full turn every six seconds. */
+        animation: preloader-turn 6s linear infinite;
+      }
+      #preloader .name {
+        color: #1a2340;
+        font: 900 clamp(1.9rem, 9vw, 4rem) / 1 'Fraunces Variable', Georgia, 'Times New Roman', serif;
+        letter-spacing: -0.01em;
+      }
+      #preloader .tag {
+        margin-top: 0.9rem;
+        padding-left: 0.4em; /* balances the trailing letter-spacing so it sits centred */
+        color: #6b1e2e;
+        font: 700 clamp(0.8rem, 2.8vw, 1.05rem) / 1 'Inter Variable', system-ui, sans-serif;
+        letter-spacing: 0.4em;
+      }
+      @keyframes preloader-turn {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      /* Reduced motion: the shop stands still. */
+      @media (prefers-reduced-motion: reduce) {
+        #preloader svg {
+          animation: none;
+        }
       }
       html.skip-preloader #preloader {
         display: none;
       }
     </style>
     <script>
-      // Only show the preloader on the first page of a visit.
+      // Only show the loading screen on the first page of a browser session.
       try {
         if (sessionStorage.getItem('sj-seen')) document.documentElement.classList.add('skip-preloader')
         else sessionStorage.setItem('sj-seen', '1')
@@ -127,7 +161,70 @@
     </noscript>
   </head>
   <body>
-    <div id="preloader" aria-hidden="true"><div>St. John's<br />Mini Market</div></div>
+    <div id="preloader" aria-hidden="true">
+      <!-- A little corner shop, drawn flat like a children's book. -->
+      <svg viewBox="0 0 240 220" xmlns="http://www.w3.org/2000/svg">
+        <g stroke="#1a2340" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+          <!-- walls -->
+          <rect x="32" y="62" width="176" height="132" rx="6" fill="#f5efe0" />
+          <!-- windows -->
+          <rect x="46" y="116" width="42" height="32" rx="4" fill="#5fb4e0" fill-opacity="0.35" />
+          <rect x="152" y="116" width="42" height="32" rx="4" fill="#5fb4e0" fill-opacity="0.35" />
+          <!-- door, with warm light in its window -->
+          <rect x="100" y="118" width="40" height="76" rx="5" fill="#6b1e2e" />
+          <rect x="108" y="127" width="24" height="30" rx="3" fill="#f8d27a" stroke-width="2" />
+          <!-- fruit crates -->
+          <rect x="44" y="168" width="46" height="26" rx="3" fill="#d9a865" />
+          <rect x="150" y="168" width="46" height="26" rx="3" fill="#d9a865" />
+          <!-- sign -->
+          <rect x="24" y="30" width="192" height="40" rx="7" fill="#5fb4e0" />
+          <!-- awning with a scalloped edge -->
+          <path
+            d="M30 70H210L222 96q-8.5 13-17 0q-8.5 13-17 0q-8.5 13-17 0q-8.5 13-17 0q-8.5 13-17 0q-8.5 13-17 0q-8.5 13-17 0q-8.5 13-17 0q-8.5 13-17 0q-8.5 13-17 0q-8.5 13-17 0q-8.5 13-17 0Z"
+            fill="#c4312a"
+          />
+          <!-- pavement -->
+          <path d="M14 194H226" />
+        </g>
+        <!-- warm glow spilling from the doorway -->
+        <ellipse cx="120" cy="200" rx="34" ry="5" fill="#f8d27a" opacity="0.7" />
+        <circle cx="132" cy="166" r="2.5" fill="#f8d27a" />
+        <!-- fruit: oranges on the left, greens on the right -->
+        <g stroke="#1a2340" stroke-width="2">
+          <circle cx="55" cy="163" r="7" fill="#e8892b" />
+          <circle cx="68" cy="160" r="7" fill="#5da35b" />
+          <circle cx="80" cy="163" r="7" fill="#e8892b" />
+          <circle cx="161" cy="163" r="7" fill="#5da35b" />
+          <circle cx="174" cy="160" r="7" fill="#e8892b" />
+          <circle cx="186" cy="163" r="7" fill="#5da35b" />
+        </g>
+        <text
+          x="120"
+          y="57"
+          text-anchor="middle"
+          font-family="Georgia, 'Times New Roman', serif"
+          font-size="19"
+          font-weight="700"
+          letter-spacing="1.5"
+          fill="#f5efe0"
+          stroke="#1a2340"
+          stroke-width="2.5"
+          paint-order="stroke"
+        >
+          FOOD &amp; WINE
+        </text>
+      </svg>
+      <div>
+        <div class="name">ST. JOHN'S<br />MINI MARKET</div>
+        <div class="tag">FOOD &amp; WINE</div>
+      </div>
+    </div>
+    <script>
+      // Note when the loading screen was first painted, so its minimum time is counted from then.
+      requestAnimationFrame(function () {
+        window.__preloaderShownAt = performance.now()
+      })
+    </script>
     <div id="root"></div>
     <noscript>
       <h1>St. John's Mini Market</h1>

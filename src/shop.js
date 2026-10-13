@@ -27,12 +27,14 @@ export const eyebrow = 'text-xs font-bold uppercase tracking-[0.2em] text-burgun
 // Section headings are deliberately calm: sentence case, medium size.
 export const heading = 'font-display text-[clamp(1.75rem,4.2vw,2.75rem)] font-semibold leading-[1.1]'
 
-// The preloader stays up until 800ms after the page started loading. On a slow
-// connection that moment has already passed by the time the app arrives, so
-// nobody waits longer than they have to.
+// How long the loading screen still has to stay up, in milliseconds, counted
+// from the moment the app is ready. It is shown for at least 1.6 seconds (1
+// second for visitors who prefer reduced motion), measured from when it was
+// first painted, so time already spent downloading counts towards it.
+const MIN_PRELOADER_MS = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1000 : 1600
 export const PRELOADER_MS = document.documentElement.classList.contains('skip-preloader')
   ? 0
-  : Math.max(0, 800 - performance.now())
+  : Math.max(0, (window.__preloaderShownAt ?? performance.now()) + MIN_PRELOADER_MS - performance.now())
 
 // Seconds to hold the hero entrance while the preloader is on screen.
 export const INTRO_DELAY = PRELOADER_MS / 1000
