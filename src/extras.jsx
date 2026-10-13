@@ -239,12 +239,13 @@ export function MiniNav({ show }) {
   )
 }
 
-// Each of these is shown with a "Google review" tag, so each must be a real
-// review from the shop's Google listing, word for word. Do not add invented ones.
+// Real reviews from the shop's Google listing, word for word (checked by the shop).
+// Each is shown with a "Google review" tag, so do not add invented ones.
 const REVIEWS = [
-  'Open late, always a friendly hello, and they stock the seasoning I cannot find anywhere else round here. Proper local shop.',
-  'Real Polish bread and pickles on the shelf, which saves me a trip across town. The lads behind the counter always remember you.',
-  'Popped in for milk and came out having paid the gas and topped up my phone as well. Fruit and veg out front is always fresh.',
+  'This is the most frequently visited shop by people wearing slippers, and we love your attitude and your orange juice!',
+  'Probably the best corner shop in NW London not gonna lie',
+  'Off licence. Friendly staff. Polish. Caribbean. Fruit and vegetables. News agent. Groceries.',
+  'Great staff and good products',
 ]
 
 function Stars({ className = 'h-4 w-4' }) {
@@ -281,13 +282,13 @@ export function Reviews() {
           </Reveal>
         </div>
 
-        <ul className="mt-8 grid gap-5 md:grid-cols-3 lg:gap-8">
+        <ul className="mt-8 grid gap-5 md:grid-cols-2 desk:grid-cols-4 desk:gap-6">
           {REVIEWS.map((quote, i) => (
-            <Reveal as="li" key={i} delay={i * 0.08} className={i === 1 ? 'md:mt-6' : ''}>
+            <Reveal as="li" key={i} delay={i * 0.08} className={i % 2 === 1 ? 'md:mt-6' : ''}>
               <m.figure
                 whileHover={{ y: -6 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-                className="relative h-full border border-navy/20 bg-offwhite p-6 transition-shadow duration-300 hover:shadow-lift sm:p-8"
+                className="relative h-full border border-navy/20 bg-offwhite p-6 transition-shadow duration-300 hover:shadow-lift sm:p-8 desk:p-6"
               >
                 <div className="flex items-center justify-between gap-4">
                   <Stars />
@@ -295,7 +296,7 @@ export function Reviews() {
                     Google review
                   </span>
                 </div>
-                <blockquote className="font-display mt-5 text-xl font-medium leading-snug sm:text-2xl">
+                <blockquote className="font-display mt-5 text-xl font-medium leading-snug sm:text-2xl desk:text-[1.375rem]">
                   “{quote}”
                 </blockquote>
               </m.figure>
