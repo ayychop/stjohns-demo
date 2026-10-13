@@ -4,9 +4,6 @@ export const SHOP = {
   name: "St. John's Mini Market",
   phone: '020 8965 9565',
   tel: 'tel:+442089659565',
-  // PLACEHOLDER: swap for the shop's real WhatsApp number, in international
-  // format with no plus sign or spaces (e.g. 447911123456).
-  whatsapp: '440000000000',
   address: '90 St. Johns Ave, London NW10 4EG',
   openHour: 7,
   closeHour: 23,

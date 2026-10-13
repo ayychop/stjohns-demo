@@ -19,7 +19,7 @@ npm run logo     # redraw the logo after editing scripts/logo-paths.mjs
 - **Domain:** set `VITE_SITE_URL` in `.env`. It feeds the canonical URL, the Open Graph and Twitter tags and the LocalBusiness schema.
 - **Logo and photos:** see `public/images/README.md`.
 - **Share image:** the Open Graph image in `index.html` is the logo on a baby-blue card (`public/og-image.png`) until a shop-front photo exists.
-- **WhatsApp:** `whatsapp` in `src/shop.js` is a placeholder number.
+- **Reviews:** the three quotes in `REVIEWS` (`src/extras.jsx`) are shown with a "Google review" tag. Each must be a real review, word for word, from the shop's Google listing.
 - **Map pin:** the `geo` coordinates in `index.html` are approximate.
 - **Legal:** `privacy.html` and `terms.html` are starting-point copy and should be checked by the shop owner.
 

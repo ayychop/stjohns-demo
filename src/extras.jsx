@@ -6,7 +6,6 @@ import {
   Banana,
   Carrot,
   Flame,
-  MessageCircle,
   Navigation,
   Phone,
   Plus,
@@ -240,31 +239,12 @@ export function MiniNav({ show }) {
   )
 }
 
-// PLACEHOLDER REVIEWS: these are sample quotes, not real customers. Replace
-// them with genuine Google reviews (quote and name), then set `sample: false`
-// to remove the "Sample review" tag. Do not publish invented reviews as real.
+// Each of these is shown with a "Google review" tag, so each must be a real
+// review from the shop's Google listing, word for word. Do not add invented ones.
 const REVIEWS = [
-  {
-    quote:
-      'Open late, always a friendly hello, and they stock the seasoning I cannot find anywhere else round here. Proper local shop.',
-    name: 'Reviewer name',
-    when: 'Date of review',
-    sample: true,
-  },
-  {
-    quote:
-      'Real Polish bread and pickles on the shelf, which saves me a trip across town. The lads behind the counter always remember you.',
-    name: 'Reviewer name',
-    when: 'Date of review',
-    sample: true,
-  },
-  {
-    quote:
-      'Popped in for milk and came out having paid the gas and topped up my phone as well. Fruit and veg out front is always fresh.',
-    name: 'Reviewer name',
-    when: 'Date of review',
-    sample: true,
-  },
+  'Open late, always a friendly hello, and they stock the seasoning I cannot find anywhere else round here. Proper local shop.',
+  'Real Polish bread and pickles on the shelf, which saves me a trip across town. The lads behind the counter always remember you.',
+  'Popped in for milk and came out having paid the gas and topped up my phone as well. Fruit and veg out front is always fresh.',
 ]
 
 function Stars({ className = 'h-4 w-4' }) {
@@ -302,7 +282,7 @@ export function Reviews() {
         </div>
 
         <ul className="mt-8 grid gap-5 md:grid-cols-3 lg:gap-8">
-          {REVIEWS.map((review, i) => (
+          {REVIEWS.map((quote, i) => (
             <Reveal as="li" key={i} delay={i * 0.08} className={i === 1 ? 'md:mt-6' : ''}>
               <m.figure
                 whileHover={{ y: -6 }}
@@ -311,27 +291,13 @@ export function Reviews() {
               >
                 <div className="flex items-center justify-between gap-4">
                   <Stars />
-                  {review.sample && (
-                    <span className="bg-navy px-2 py-1 font-mono text-[0.65rem] uppercase tracking-[0.16em] text-cream">
-                      Sample review
-                    </span>
-                  )}
+                  <span className="bg-burgundy px-2 py-1 font-mono text-[0.65rem] uppercase tracking-[0.16em] text-cream">
+                    Google review
+                  </span>
                 </div>
                 <blockquote className="font-display mt-5 text-xl font-medium leading-snug sm:text-2xl">
-                  “{review.quote}”
+                  “{quote}”
                 </blockquote>
-                <figcaption className="mt-6 flex items-center gap-3 border-t border-navy/20 pt-5">
-                  <span
-                    aria-hidden="true"
-                    className="font-display grid h-10 w-10 place-items-center rounded-full bg-navy text-lg font-bold text-cream"
-                  >
-                    {review.name[0]}
-                  </span>
-                  <span className="text-sm leading-tight">
-                    <span className="block font-bold">{review.name}</span>
-                    <span className="text-navy/75">{review.when} · Google</span>
-                  </span>
-                </figcaption>
               </m.figure>
             </Reveal>
           ))}
@@ -472,42 +438,20 @@ export function MobileBar({ show }) {
   )
 }
 
-/**
- * WhatsApp and back-to-top buttons. On phones they sit in opposite corners,
- * just above the bottom bar; on desktop they sit side by side, bottom right.
- */
+/** Back-to-top button, bottom right. On phones it sits just above the bottom bar. */
 export function FloatingActions({ show }) {
-  const fab =
-    'fixed bottom-[calc(5.25rem+env(safe-area-inset-bottom))] z-40 grid h-13 w-13 cursor-pointer place-items-center rounded-full shadow-lift transition-colors duration-200 md:bottom-6'
-  const pop = {
-    initial: { opacity: 0, scale: 0.6 },
-    animate: { opacity: 1, scale: 1 },
-    exit: { opacity: 0, scale: 0.6 },
-    whileHover: { y: -4 },
-  }
   return (
     <AnimatePresence>
       {show && (
-        <m.a
-          key="whatsapp"
-          {...pop}
-          href={`https://wa.me/${SHOP.whatsapp}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Message us on WhatsApp"
-          className={`${fab} left-4 border-2 border-cream bg-burgundy text-cream hover:bg-navy md:left-auto md:right-[5.5rem]`}
-        >
-          <MessageCircle className="h-6 w-6" strokeWidth={2.2} aria-hidden="true" />
-        </m.a>
-      )}
-      {show && (
         <m.button
-          key="top"
-          {...pop}
+          initial={{ opacity: 0, scale: 0.6 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.6 }}
+          whileHover={{ y: -4 }}
           type="button"
           onClick={scrollToTop}
           aria-label="Back to top"
-          className={`${fab} right-4 border-2 border-cream bg-navy text-cream hover:bg-burgundy md:right-6`}
+          className="fixed bottom-[calc(5.25rem+env(safe-area-inset-bottom))] right-4 z-40 grid h-13 w-13 cursor-pointer place-items-center rounded-full border-2 border-cream bg-navy text-cream shadow-lift transition-colors duration-200 hover:bg-burgundy md:bottom-6 md:right-6"
         >
           <ArrowUp className="h-6 w-6" aria-hidden="true" />
         </m.button>
