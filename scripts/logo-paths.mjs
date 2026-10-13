@@ -1,0 +1,107 @@
+// Draws the shop logo as plain SVG outlines and writes them to src/logo-paths.js.
+// The lettering is Archivo Black (open licence), converted to shapes here so the
+// logo never depends on a font loading. Run `npm run logo` after changing any of
+// the wording, sizes or colours below; the site and the share image pick it up.
+import { readFileSync, writeFileSync } from 'node:fs'
+import opentype from 'opentype.js'
+
+const BLUE = '#5FB4E0'
+const CREAM = '#F5EFE0'
+const BURGUNDY = '#6B1E2E'
+
+const TOP = "St. John's Mini Market"
+const STRIP_LEFT = 'OFF LICENCE · NEWS AGENTS · GROCERIES · POLISH · CARIBBEAN'
+const STRIP_RIGHT = 'FRUIT & VEG'
+
+const WIDTH = 1000
+const MARGIN = 26
+
+const woff = readFileSync('node_modules/@fontsource/archivo-black/files/archivo-black-latin-400-normal.woff')
+const font = opentype.parse(woff.buffer.slice(woff.byteOffset, woff.byteOffset + woff.byteLength))
+const capHeight = font.tables.os2.sCapHeight / font.unitsPerEm
+
+const n = (v) => Math.round(v * 10) / 10
+const width = (text, size, letterSpacing = 0) => font.getAdvanceWidth(text, size, { letterSpacing }) - letterSpacing * size
+const outline = (text, x, y, size, letterSpacing = 0) =>
+  font
+    .getPath(text, x, y, size, { letterSpacing })
+    .commands.map((c) => {
+      if (c.type === 'Z') return 'Z'
+      const points = c.type === 'C' ? [c.x1, c.y1, c.x2, c.y2] : c.type === 'Q' ? [c.x1, c.y1] : []
+      return c.type + [...points, c.x, c.y].map(n).join(' ')
+    })
+    .join('')
+    // Close every shape, so the outline is joined cleanly at its starting corner.
+    .replace(/(?<=\d)(?=M|$)/g, 'Z')
+const centred = (text, cx, y, size, letterSpacing = 0) => outline(text, cx - width(text, size, letterSpacing) / 2, y, size, letterSpacing)
+const circle = (cx, cy, r) => `M${n(cx - r)} ${n(cy)}a${r} ${r} 0 1 0 ${r * 2} 0a${r} ${r} 0 1 0 ${-r * 2} 0Z`
+const pill = (x1, x2, y, h, r) =>
+  `M${n(x1 + r)} ${n(y)}H${n(x2 - r)}a${r} ${r} 0 0 1 ${r} ${r}V${n(y + h - r)}a${r} ${r} 0 0 1 ${-r} ${r}H${n(x1 + r)}a${r} ${r} 0 0 1 ${-r} ${-r}V${n(y + r)}a${r} ${r} 0 0 1 ${r} ${-r}Z`
+
+// Small print across the top.
+const topSize = 38
+const topBaseline = MARGIN + capHeight * topSize
+const top = centred(TOP, WIDTH / 2, topBaseline, topSize, 0.07)
+
+// FOOD & WINE, sized to fill the width, with the ampersand centred between the two words.
+const SPACING = 0.015
+const WORD_GAP = 0.2
+const mainWidth = WIDTH - MARGIN * 2 - 10
+const mainSize = mainWidth / (width('FOOD', 1, SPACING) + width('&', 1) + width('WINE', 1, SPACING) + WORD_GAP * 2)
+const mainLeft = MARGIN + 5
+const mainTop = topBaseline + 24
+const mainBaseline = mainTop + capHeight * mainSize
+const ampLeft = mainLeft + width('FOOD', mainSize, SPACING) + WORD_GAP * mainSize
+const wineLeft = ampLeft + width('&', mainSize) + WORD_GAP * mainSize
+const food = outline('FOOD', mainLeft, mainBaseline, mainSize, SPACING)
+const amp = outline('&', ampLeft, mainBaseline, mainSize)
+const wine = outline('WINE', wineLeft, mainBaseline, mainSize, SPACING)
+
+// The grapes hang from the I of WINE and break the strip, as on the shop sign.
+const grapeX = wineLeft + font.getAdvanceWidth('W', mainSize, { letterSpacing: SPACING }) + width('I', mainSize) / 2
+const stripTop = mainBaseline + 24
+const stripHeight = 42
+const R = 10.5
+const rowGap = R * 1.72
+const grapeTop = stripTop + 7
+const grapes = [
+  [-2 * R, 0], [0, 0], [2 * R, 0],
+  [-R, rowGap], [R, rowGap],
+  [0, rowGap * 2],
+].map(([dx, dy]) => circle(grapeX + dx, grapeTop + dy, R)).join('')
+const stem = `M${n(grapeX - 3.5)} ${n(mainBaseline - 2)}h7V${n(grapeTop - 4)}h-7Z`
+const leaf = `M${n(grapeX + 3)} ${n(grapeTop - 15)}c6-11 21-11 26 0-6 9-19 10-26 0Z`
+
+const gap = R * 3 + 14
+const leftEnd = grapeX - gap
+const rightStart = grapeX + gap
+const strip = pill(MARGIN, leftEnd, stripTop, stripHeight, 6) + pill(rightStart, WIDTH - MARGIN, stripTop, stripHeight, 6)
+const stripSize = Math.min(
+  (leftEnd - MARGIN - 32) / width(STRIP_LEFT, 1, 0.04),
+  (WIDTH - MARGIN - rightStart - 24) / width(STRIP_RIGHT, 1, 0.04),
+)
+const stripBaseline = stripTop + stripHeight / 2 + (capHeight * stripSize) / 2
+const stripText =
+  centred(STRIP_LEFT, (MARGIN + leftEnd) / 2, stripBaseline, stripSize, 0.04) +
+  centred(STRIP_RIGHT, (rightStart + WIDTH - MARGIN) / 2, stripBaseline, stripSize, 0.04)
+
+const HEIGHT = Math.ceil(grapeTop + rowGap * 2 + R + MARGIN - 8)
+
+// Painted back to front. A layer with a stroke is outlined, the outline sitting behind its fill.
+const layers = [
+  { d: strip, fill: BURGUNDY },
+  { d: stripText, fill: CREAM },
+  { d: top, fill: BURGUNDY, stroke: CREAM, strokeWidth: 4 },
+  { d: food + wine, fill: CREAM, stroke: BURGUNDY, strokeWidth: 11 },
+  { d: amp, fill: BURGUNDY, stroke: CREAM, strokeWidth: 6 },
+  { d: stem + leaf, fill: BURGUNDY, stroke: CREAM, strokeWidth: 4 },
+  { d: grapes, fill: BURGUNDY, stroke: CREAM, strokeWidth: 3 },
+]
+
+writeFileSync(
+  'src/logo-paths.js',
+  `// Generated by scripts/logo-paths.mjs (npm run logo). Do not edit by hand.
+export const LOGO = ${JSON.stringify({ width: WIDTH, height: HEIGHT, plate: BLUE, layers })}
+`,
+)
+console.log(`logo: ${WIDTH}x${HEIGHT}, lettering ${n(mainSize)}px, strip ${n(stripSize)}px`)

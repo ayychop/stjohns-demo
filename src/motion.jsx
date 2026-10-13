@@ -22,7 +22,7 @@ let lenis = null
 export function useSmoothScroll() {
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    lenis = new Lenis({ autoRaf: true, anchors: { offset: -80 }, lerp: 0.1 })
+    lenis = new Lenis({ autoRaf: true, anchors: true, lerp: 0.1 })
     return () => {
       lenis.destroy()
       lenis = null
@@ -227,6 +227,48 @@ export function Magnetic({ strength = 0.25, max = 6, className, children }) {
 }
 
 /**
+ * Tilts in 3D toward the mouse cursor, by `max` degrees at most. Desktop mouse only:
+ * touch, narrow screens and reduced motion leave it flat.
+ */
+export function Tilt({ as = 'div', max = 6, children, ...rest }) {
+  const Tag = m[as]
+  // Measured once as the cursor arrives, so moving the mouse never forces a layout.
+  const rect = useRef(null)
+  const rotateX = useSpring(useMotionValue(0), { stiffness: 240, damping: 20, mass: 0.5 })
+  const rotateY = useSpring(useMotionValue(0), { stiffness: 240, damping: 20, mass: 0.5 })
+  const reduced = useReducedMotion()
+
+  const lean = (ratio) => Math.max(-max, Math.min(max, (ratio - 0.5) * 2 * max))
+  const onPointerEnter = (e) => {
+    if (e.pointerType !== 'mouse' || reduced || window.innerWidth < 1024) return
+    rect.current = e.currentTarget.getBoundingClientRect()
+  }
+  const onPointerMove = (e) => {
+    const box = rect.current
+    if (!box) return
+    rotateY.set(lean((e.clientX - box.left) / box.width))
+    rotateX.set(-lean((e.clientY - box.top) / box.height))
+  }
+  const reset = () => {
+    rect.current = null
+    rotateX.set(0)
+    rotateY.set(0)
+  }
+
+  return (
+    <Tag
+      style={{ rotateX, rotateY, transformPerspective: 800 }}
+      onPointerEnter={onPointerEnter}
+      onPointerMove={onPointerMove}
+      onPointerLeave={reset}
+      {...rest}
+    >
+      {children}
+    </Tag>
+  )
+}
+
+/**
  * Layered depth: returns a ref for a section and a `y` for a decoration inside
  * it, which drifts by `distance` pixels either way as the section scrolls past.
  */
@@ -238,12 +280,18 @@ export function useParallax(distance = 40) {
   return [ref, reduced ? 0 : y]
 }
 
+const riseLine = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
+}
+
 /**
- * Headline whose lines rise out from behind a mask, one after another, once.
- * `immediate` plays on page load instead of waiting for scroll. With reduced
- * motion it is a plain static headline.
+ * Headline whose lines fade in and lift 20px into place over 0.6 seconds, one
+ * after another, once, when it enters the viewport. `immediate` plays on page
+ * load instead of waiting for scroll. With reduced motion it is a plain static
+ * headline.
  */
-export function MaskLines({ as = 'h2', lines, className, delay = 0, immediate = false }) {
+export function RevealLines({ as = 'h2', lines, className, delay = 0, immediate = false }) {
   const reduced = useReducedMotion()
   if (reduced) {
     const Plain = as
@@ -262,12 +310,9 @@ export function MaskLines({ as = 'h2', lines, className, delay = 0, immediate = 
   return (
     <Tag className={className} initial="hidden" transition={{ staggerChildren: 0.1, delayChildren: delay }} {...trigger}>
       {lines.map((line, i) => (
-        // Padding keeps descenders from being cut off by the mask.
-        <span key={i} className="-mb-[0.14em] block overflow-hidden pb-[0.14em]">
-          <m.span className="block" variants={maskLine}>
-            {line}
-          </m.span>
-        </span>
+        <m.span key={i} className="block" variants={riseLine}>
+          {line}
+        </m.span>
       ))}
     </Tag>
   )
@@ -276,12 +321,13 @@ export function MaskLines({ as = 'h2', lines, className, delay = 0, immediate = 
 /**
  * Shop photo that fills its container. Give the container an aspect ratio so
  * nothing shifts while the photo loads. A warm block in the brand colours
- * shows while it loads, and stays if it cannot be loaded.
+ * shows while it loads, and stays if it cannot be loaded. The `photo` class
+ * gives every picture on the site the same warm grade and soft vignette.
  */
 export function ShopImage({ src, alt, className = '', imgClassName = '', eager = false }) {
   const [failed, setFailed] = useState(false)
   return (
-    <div className={`photo-warm relative overflow-hidden ${className}`}>
+    <div className={`photo photo-warm relative overflow-hidden ${className}`}>
       {!failed && (
         <img
           src={src}

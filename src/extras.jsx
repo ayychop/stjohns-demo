@@ -15,19 +15,19 @@ import {
   Sunrise,
   Wheat,
 } from 'lucide-react'
-import { Counter, MaskLines, Reveal, scrollToTop } from './motion.jsx'
-import { SHOP, WRAP, btn, eyebrow, introRemaining } from './shop.js'
+import { Counter, Reveal, RevealLines, scrollToTop } from './motion.jsx'
+import { SECTION, SHOP, WRAP, btn, eyebrow, introRemaining } from './shop.js'
 
 // Seven photos from /public/images, cropped square. If one fails to load, the polaroid shows
 // a warm colour wash and a small line icon instead.
 const POLAROIDS = [
-  { src: '/images/produce-crate.jpg', caption: 'Fresh in today', wash: 'wash-red', icon: Carrot, tilt: -4, drop: 6 },
+  { src: '/images/produce-crate.jpg', caption: 'Fresh fruit and veg', wash: 'wash-red', icon: Carrot, tilt: -4, drop: 6 },
   { src: '/images/plantain.jpg', caption: 'Plantain, yam, green banana', wash: 'wash-cream', icon: Banana, tilt: 3, drop: -4 },
   { src: '/images/polish-deli.jpg', caption: 'Polish deli', wash: 'wash-burgundy', icon: Soup, tilt: -2, drop: 10 },
-  { src: '/images/spices.jpg', caption: 'Seasoning and spice', wash: 'wash-cream', icon: Flame, tilt: 5, drop: 0 },
-  { src: '/images/fresh-bread.jpg', caption: 'Bread, baked fresh', wash: 'wash-red', icon: Wheat, tilt: -3, drop: -6 },
-  { src: '/images/tropical-fruit.jpg', caption: 'A taste of home', wash: 'wash-burgundy', icon: Sunrise, tilt: 2, drop: 8 },
-  { src: '/images/shop-aisle.jpg', caption: 'Aisle by aisle', wash: 'wash-cream', icon: ShoppingBasket, tilt: -5, drop: 2 },
+  { src: '/images/spices.jpg', caption: 'Spices and seasoning', wash: 'wash-cream', icon: Flame, tilt: 5, drop: 0 },
+  { src: '/images/fresh-bread.jpg', caption: 'Fresh bread', wash: 'wash-red', icon: Wheat, tilt: -3, drop: -6 },
+  { src: '/images/tropical-fruit.jpg', caption: 'Tropical fruit', wash: 'wash-burgundy', icon: Sunrise, tilt: 2, drop: 8 },
+  { src: '/images/shop-aisle.jpg', caption: 'Groceries', wash: 'wash-cream', icon: ShoppingBasket, tilt: -5, drop: 2 },
 ]
 
 // Each polaroid lands one after another: a fade, a rise and a little rotation
@@ -46,8 +46,10 @@ function Polaroid({ shot }) {
   const [failed, setFailed] = useState(false)
   const Icon = shot.icon
   return (
-    <figure className="w-36 bg-offwhite p-2 pb-2.5 shadow-[0_16px_32px_-12px_rgb(26_35_64/0.6)] sm:w-48 sm:p-2.5">
-      <div className={`wash ${shot.wash} relative aspect-square w-full overflow-hidden`}>
+    <figure className="w-56 bg-offwhite p-2.5 shadow-[0_16px_32px_-12px_rgb(26_35_64/0.6)] md:w-48">
+      <div className={`photo wash ${shot.wash} relative aspect-square w-full overflow-hidden`}>
+        {/* Thin burgundy bars top and bottom, like a film still. */}
+        <div className="absolute inset-0 z-10 border-y-2 border-burgundy" />
         {failed ? (
           <Icon
             strokeWidth={1.25}
@@ -72,10 +74,10 @@ function Polaroid({ shot }) {
 }
 
 /**
- * Strip of tilted, overlapping polaroids that hangs off the bottom of the hero.
- * The first time it is on screen the polaroids land one by one (fade, rotate,
- * rise); that never replays. After that the strip drifts slowly sideways and
- * pauses under the mouse.
+ * Strip of tilted polaroids under the hero. The first time it is on screen the
+ * polaroids land one by one (fade, rotate, rise); that never replays. On desktop
+ * they overlap and the strip drifts slowly sideways at a constant speed. On
+ * phones it is a single run to swipe through, snapping from photo to photo.
  */
 export function PolaroidMarquee() {
   const ref = useRef(null)
@@ -86,18 +88,22 @@ export function PolaroidMarquee() {
   if (inView && wait.current === null) wait.current = introRemaining()
   const Card = reduced ? 'div' : m.div
   return (
-    <div ref={ref} aria-hidden="true" className="marquee relative z-10 -mt-20 overflow-x-clip pb-6 sm:-mt-24">
+    <div
+      ref={ref}
+      aria-hidden="true"
+      className="marquee no-scrollbar relative py-7 max-md:snap-x max-md:snap-mandatory max-md:overflow-x-auto md:overflow-x-clip md:py-8"
+    >
       <m.div
-        className="marquee-track"
+        className="marquee-track max-md:px-5"
         initial="hidden"
         animate={inView ? 'show' : 'hidden'}
         transition={{ staggerChildren: 0.1, delayChildren: wait.current ?? 0 }}
       >
-        {/* Four identical runs: the track slides by exactly one run, then repeats. */}
+        {/* Two identical halves of two runs each: the track slides by exactly one half, then repeats. Phones show just the first run. */}
         {[...POLAROIDS, ...POLAROIDS, ...POLAROIDS, ...POLAROIDS].map((shot, i) => (
           <Card
             key={i}
-            className="-mr-3 shrink-0"
+            className={`mr-4 shrink-0 snap-center last:mr-0 md:-mr-3 md:last:-mr-3 ${i >= POLAROIDS.length ? 'max-md:hidden' : ''}`}
             {...(reduced
               ? { style: { transform: `translateY(${shot.drop}px) rotate(${shot.tilt}deg)` } }
               : { variants: landing, custom: shot })}
@@ -107,6 +113,104 @@ export function PolaroidMarquee() {
         ))}
       </m.div>
     </div>
+  )
+}
+
+/**
+ * Thin ticker between sections, in burgundy lettering on whatever colour it is
+ * given, so it belongs to the section around it. The track holds the same long
+ * run of words twice and slides left by exactly half its width, so the loop is
+ * seamless; the movement is one CSS transform animation, with no JavaScript.
+ */
+export function MarqueeBand({ items, className = '' }) {
+  // Each half repeats the words three times, which is wider than any ordinary screen.
+  const run = [...items, ...items, ...items]
+  return (
+    <div aria-hidden="true" className={`flex h-11 items-center overflow-hidden text-burgundy ${className}`}>
+      <div className="ticker-track">
+        {[0, 1].map((half) => (
+          <p key={half} className="flex shrink-0 items-center text-xs font-bold uppercase tracking-[0.22em]">
+            {run.map((item, i) => (
+              <span key={i} className="flex items-center whitespace-nowrap">
+                {item}
+                <span className="mx-5 h-1.5 w-1.5 rotate-45 bg-current opacity-45" />
+              </span>
+            ))}
+          </p>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+const SECTIONS = [
+  { id: 'what-we-sell', label: 'What We Sell' },
+  { id: 'visit', label: 'Visit Us' },
+  { id: 'reviews', label: 'Reviews' },
+  { id: 'faq', label: 'FAQ' },
+]
+
+/**
+ * Bar of section links that slides down from behind the header once the hero
+ * has gone. It is the same frosted cream as the header, so the two read as one
+ * sticky unit, with a shadow underneath. The link for the section on screen is
+ * bold and underlined.
+ */
+export function MiniNav({ show }) {
+  const [active, setActive] = useState(null)
+  useEffect(() => {
+    // A section counts as current while it crosses a line two-fifths of the way down the screen.
+    const onScreen = new Set()
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) onScreen.add(entry.target.id)
+          else onScreen.delete(entry.target.id)
+        }
+        setActive(SECTIONS.find((section) => onScreen.has(section.id))?.id ?? null)
+      },
+      { rootMargin: '-40% 0px -60% 0px' },
+    )
+    for (const { id } of SECTIONS) {
+      const section = document.getElementById(id)
+      if (section) observer.observe(section)
+    }
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <AnimatePresence>
+      {show && (
+        <m.nav
+          aria-label="Sections"
+          initial={{ y: '-100%' }}
+          animate={{ y: 0 }}
+          exit={{ y: '-100%' }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          className="fixed inset-x-0 top-20 z-40 border-b-2 border-burgundy bg-cream/85 text-burgundy shadow-[0_14px_28px_-14px_rgb(26_35_64/0.45)] backdrop-blur-xl backdrop-saturate-150 sm:top-24"
+        >
+          {/* Evenly spaced across the width on phones, centred on desktop. */}
+          <ul className={`${WRAP} flex h-12 items-center justify-between sm:justify-center sm:gap-14`}>
+            {SECTIONS.map(({ id, label }) => {
+              const current = active === id
+              return (
+                <li key={id} className="shrink-0">
+                  <a
+                    href={`#${id}`}
+                    aria-current={current ? 'location' : undefined}
+                    className={`flex min-h-8 items-center border-b-2 text-[0.7rem] uppercase tracking-[0.14em] transition-colors duration-200 md:text-xs ${
+                      current ? 'border-burgundy font-extrabold' : 'border-transparent font-semibold hover:border-burgundy/40'
+                    }`}
+                  >
+                    {label}
+                  </a>
+                </li>
+              )
+            })}
+          </ul>
+        </m.nav>
+      )}
+    </AnimatePresence>
   )
 }
 
@@ -149,17 +253,17 @@ function Stars({ className = 'h-4 w-4' }) {
 
 export function Reviews() {
   return (
-    <section id="reviews" className="py-20 sm:py-28">
+    <section id="reviews" className={SECTION}>
       <div className={WRAP}>
         <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-6">
           <div>
             <Reveal as="p" className={eyebrow}>
               <span className="h-0.5 w-8 bg-burgundy" aria-hidden="true" />
-              Word on the street
+              Google reviews
             </Reveal>
-            <MaskLines
-              lines={['What the', 'neighbourhood says']}
-              className="font-display mt-5 text-[clamp(1.9rem,8vw,5.5rem)] font-black uppercase leading-[0.92]"
+            <RevealLines
+              lines={['What customers', 'say']}
+              className="font-display heading-depth mt-5 text-[clamp(1.9rem,8vw,5.5rem)] font-black uppercase leading-[0.92]"
             />
           </div>
           <Reveal className="mb-2 flex items-center gap-3 border-2 border-navy px-4 py-3">
@@ -171,9 +275,9 @@ export function Reviews() {
           </Reveal>
         </div>
 
-        <ul className="mt-12 grid gap-6 md:grid-cols-3 lg:gap-8">
+        <ul className="mt-8 grid gap-5 md:grid-cols-3 lg:gap-8">
           {REVIEWS.map((review, i) => (
-            <Reveal as="li" key={i} delay={i * 0.08} className={i === 1 ? 'md:mt-10' : ''}>
+            <Reveal as="li" key={i} delay={i * 0.08} className={i === 1 ? 'md:mt-6' : ''}>
               <m.figure
                 whileHover={{ y: -6 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 22 }}
@@ -214,23 +318,23 @@ export function Reviews() {
 const FAQS = [
   {
     q: 'What time do you open?',
-    a: 'Seven in the morning, every day of the week, and we do not shut until eleven at night. Weekends are exactly the same as weekdays.',
+    a: 'We open at 7am and close at 11pm, every day of the week, including weekends.',
   },
   {
     q: 'Do you deliver?',
-    a: `Not at the moment. Everything is on the shelf, though, and we are a short walk from most of Harlesden. If you want to check we have something before you set off, ring us on ${SHOP.phone}.`,
+    a: `No, we do not deliver. To check if we have something in stock, call us on ${SHOP.phone}.`,
   },
   {
     q: 'Can I top up my Oyster or phone here?',
-    a: 'Yes to both. We top up Oyster cards for TfL and do mobile top-ups for all the major networks, right at the counter.',
+    a: 'Yes. We top up Oyster cards and do mobile top ups for all major networks at the till.',
   },
   {
     q: 'Do you sell Caribbean and Polish foods?',
-    a: 'Yes, and not just a token row of each. There is a dedicated Caribbean shelf (rice, peas, plantain, seasoning, spice) and a dedicated Polish shelf (deli, breads, pickles, sweets, cured meats).',
+    a: 'Yes. We have a Caribbean shelf with rice, peas, plantain, seasoning, and spices, and a Polish shelf with deli, bread, pickles, sweets, and cured meats.',
   },
   {
     q: 'Do you take card payments?',
-    a: 'Yes, all major cards are accepted. Cash is always welcome too.',
+    a: 'Yes, we take all major cards. We take cash too.',
   },
 ]
 
@@ -239,18 +343,18 @@ export function Faq() {
   return (
     <section id="faq">
       <div aria-hidden="true" className="carnival-stripe" />
-      <div className={`${WRAP} grid gap-10 py-20 sm:py-28 lg:grid-cols-12 lg:gap-14`}>
+      <div className={`${WRAP} ${SECTION} grid gap-10 lg:grid-cols-12 lg:gap-14`}>
         <div className="lg:col-span-5">
           <Reveal as="p" className={eyebrow}>
             <span className="h-0.5 w-8 bg-burgundy" aria-hidden="true" />
-            Before you pop in
+            FAQ
           </Reveal>
-          <MaskLines
-            lines={['The questions', 'we always get']}
-            className="font-display mt-5 text-[clamp(1.9rem,8vw,4.5rem)] font-black uppercase leading-[0.92]"
+          <RevealLines
+            lines={['Common', 'questions']}
+            className="font-display heading-depth mt-5 text-[clamp(1.9rem,8vw,4.5rem)] font-black uppercase leading-[0.92]"
           />
           <Reveal as="p" delay={0.1} className="mt-6 max-w-sm leading-relaxed text-navy/75">
-            Something else on your mind? Ask at the counter, or give us a ring on{' '}
+            Got another question? Ask at the till, or call us on{' '}
             <a
               href={SHOP.tel}
               className="font-bold text-navy underline decoration-burgundy decoration-2 underline-offset-4 hover:text-burgundy"
@@ -273,7 +377,7 @@ export function Faq() {
                     aria-expanded={open}
                     aria-controls={`faq-a-${i}`}
                     onClick={() => setOpenIndex(open ? -1 : i)}
-                    className="font-display group flex w-full cursor-pointer items-center justify-between gap-6 py-5 text-left text-2xl font-bold leading-tight transition-colors hover:text-burgundy sm:py-6 sm:text-3xl"
+                    className="font-display group flex w-full cursor-pointer items-center justify-between gap-6 py-4 text-left text-2xl font-bold leading-tight transition-colors hover:text-burgundy sm:py-5 sm:text-3xl"
                   >
                     {faq.q}
                     <span

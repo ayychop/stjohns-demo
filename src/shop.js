@@ -20,6 +20,8 @@ export const SHOP = {
 export const WRAP = 'mx-auto max-w-7xl px-5 sm:px-8'
 export const btn =
   'inline-flex min-h-12 items-center justify-center gap-2.5 rounded-[3px] text-sm font-bold uppercase tracking-[0.08em] transition-colors duration-200'
+// Every section has the same breathing room: 48px on phones, 72px on desktop.
+export const SECTION = 'py-12 md:py-18'
 export const eyebrow = 'flex items-center gap-3 text-xs font-bold uppercase tracking-[0.22em]'
 
 // The opening sequence (src/intro.jsx) lasts 2.5 seconds. For the first 1.8 the
