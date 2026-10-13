@@ -73,9 +73,8 @@ const PRODUCTS = [
   { label: 'Fruit & Veg', text: 'Fresh every day', src: '/images/sell-fruit-veg.jpg' },
   { label: 'PayPoint', text: 'Pay your bills at the till', src: '/images/sell-paypoint.jpg' },
   { label: 'Mobile Top Ups', text: 'All major networks', src: '/images/sell-top-ups.jpg' },
-  { label: 'Bus Tickets', text: 'Buy at the till', src: '/images/sell-bus.jpg' },
   { label: 'Gas & Electric Top Ups', text: 'Top up your key or card', src: '/images/sell-energy.jpg' },
-  { label: 'Oyster Top Ups', text: 'Top up your Oyster card', src: '/images/sell-oyster.jpg' },
+  { label: 'Oyster & Bus Top Ups', text: 'Top up your travel card at the till', src: '/images/sell-oyster.jpg' },
   { label: 'Amazon Click & Collect', text: 'Collect your parcels here', src: '/images/sell-parcels.jpg' },
 ]
 
@@ -683,7 +682,9 @@ function Footer({ onCookieSettings }) {
   const link = 'underline-offset-4 transition-colors hover:text-cream hover:underline'
   return (
     <footer className="relative isolate overflow-hidden bg-navy text-cream">
-      <GrapeWatermark className="absolute left-1/2 top-1/2 -z-10 w-72 -translate-x-1/2 -translate-y-1/2 text-cream opacity-[0.04] sm:w-[420px]" />
+      {/* Burgundy, like the other watermarks. It needs far more strength here than their 5%: burgundy
+          and navy are both dark, so anything fainter cannot be seen at all. */}
+      <GrapeWatermark className="absolute left-1/2 top-1/2 -z-10 w-72 -translate-x-1/2 -translate-y-1/2 text-burgundy opacity-35 sm:w-[420px]" />
       {/* Extra room at the bottom on phones so the floating buttons never cover the credit. */}
       <div className={`${WRAP} pb-24 pt-8 md:pb-12`}>
         <p className="font-display text-[clamp(2rem,6vw,4.5rem)] font-black uppercase leading-[0.95]">

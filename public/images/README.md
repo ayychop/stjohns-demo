@@ -30,9 +30,8 @@ name, then run `npm run images` to shrink it for the web.
 | `sell-fruit-veg.jpg` | What We Sell: Fruit & Veg | `1669154777196-aca4d45b581a` |
 | `sell-paypoint.jpg` | What We Sell: PayPoint | `1556742031-c6961e8560b0` |
 | `sell-top-ups.jpg` | What We Sell: Mobile Top Ups | `1592890288564-76628a30a657` |
-| `sell-bus.jpg` | What We Sell: Bus Tickets | `1632897271846-b6e3ca78aded` |
 | `sell-energy.jpg` | What We Sell: Gas & Electric Top Ups | `1555009784-ae7e7d1b97aa` |
-| `sell-oyster.jpg` | What We Sell: Oyster Top Ups | `1527497171728-16dba07f59a1` |
+| `sell-oyster.jpg` | What We Sell: Oyster & Bus Top Ups | `1527497171728-16dba07f59a1` |
 | `sell-parcels.jpg` | What We Sell: Amazon Click & Collect | `1577705998148-6da4f3963bc8` |
 
 The `sell-` photos are saved at 660 by 588 pixels, three times the size they are
