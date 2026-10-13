@@ -2,8 +2,10 @@
 @import 'lenis/dist/lenis.css';
 
 /*
-  The whole palette comes from the shop's logo. These five colours are the only
-  ones used on the site; lighter and darker shades are made with opacity.
+  The locked palette: baby blue, cream, burgundy and navy, plus the deep red of
+  the shop's awning. These are the only colours used on the site; lighter
+  shades (including the off-white for cards) are tints of them. The opening
+  sequence (src/intro.jsx) is the one exception: it is a picture of the shop.
 */
 @theme {
   --font-serif: 'Fraunces Variable', 'Playfair Display', Georgia, 'Times New Roman', serif;
@@ -13,7 +15,10 @@
   --color-cream: #f5efe0; /* main page background */
   --color-burgundy: #6b1e2e; /* the wine and grapes: buttons and accents */
   --color-navy: #1a2340; /* text */
+  --color-awning: #b8342e; /* the awning over the shopfront */
   --color-offwhite: #faf7f0; /* secondary backgrounds and cards */
+
+  --font-hand: 'Caveat', 'Bradley Hand', 'Segoe Script', cursive; /* polaroid captions */
 
   --shadow-soft: 0 1px 2px rgb(26 35 64 / 0.05), 0 12px 28px -16px rgb(26 35 64 / 0.28);
   --shadow-lift: 0 2px 4px rgb(26 35 64 / 0.06), 0 22px 44px -20px rgb(26 35 64 / 0.4);
@@ -74,17 +79,105 @@
       0.07em 0.09em 0 rgb(26 35 64 / 0.25);
   }
 
-  /* Scalloped awning edge: a row of baby-blue half circles hanging off the hero. */
-  .scallop {
-    height: 14px;
-    background: radial-gradient(circle at 14px 0, var(--color-blue) 13.5px, transparent 14px) 0 0 / 28px 14px
-      repeat-x;
+  /* Asks the browser for its sharper scaling on the header logo. */
+  .logo-crisp {
+    image-rendering: -webkit-optimize-contrast;
   }
 
-  /* Slow drift on the hero photo, when there is one. */
-  .kenburns {
-    animation: kenburns 20s ease-in-out infinite alternate;
-    will-change: transform;
+  /* The burgundy-and-cream awning stripe from the shop front. */
+  .awning {
+    background-image: repeating-linear-gradient(90deg, var(--color-burgundy) 0 28px, var(--color-cream) 28px 56px);
+  }
+
+  /* Behind every photo while it loads, and in its place if it cannot be loaded: a warm awning-red tint. */
+  .photo-warm {
+    background-color: var(--color-cream);
+    background-image:
+      radial-gradient(120% 95% at 0% 0%, rgb(245 239 224 / 0.6), transparent 58%),
+      linear-gradient(160deg, rgb(184 52 46 / 0.3), rgb(107 30 46 / 0.55));
+  }
+
+  /* The map's stand-in until the visitor agrees to cookies: a soft baby-blue tint. */
+  .placeholder-light {
+    background-color: var(--color-cream);
+    background-image: linear-gradient(160deg, rgb(95 180 224 / 0.22), rgb(95 180 224 / 0.5));
+  }
+
+  /* A soft patch of light behind the hero headline. */
+  .sun-glow {
+    background: radial-gradient(closest-side, rgb(245 239 224 / 0.45), rgb(245 239 224 / 0.15) 48%, transparent);
+    filter: blur(40px);
+  }
+  /* A coarse monochrome grain for the hero only. */
+  .grain-coarse {
+    opacity: 0.06;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.45' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 300px 300px;
+  }
+
+  /* Thin ribbon used as a divider between some sections. */
+  .carnival-stripe {
+    height: 3px;
+    background-image: repeating-linear-gradient(
+      135deg,
+      var(--color-burgundy) 0 12px,
+      var(--color-blue) 12px 24px,
+      var(--color-navy) 24px 36px
+    );
+  }
+
+  /* Cream at the top deepening towards baby blue at the bottom. */
+  .cream-to-blue {
+    background-image: linear-gradient(180deg, transparent 0%, rgb(95 180 224 / 0.08) 40%, rgb(95 180 224 / 0.3) 100%);
+  }
+
+  /* Polaroid colour washes: a brand colour with light catching the top corner. */
+  .wash {
+    background-image:
+      radial-gradient(120% 95% at 0% 0%, rgb(245 239 224 / 0.45), transparent 58%),
+      linear-gradient(160deg, var(--wash-a), var(--wash-b));
+  }
+  .wash-burgundy {
+    --wash-a: #6b1e2e;
+    --wash-b: #6b1e2e;
+    color: var(--color-cream);
+  }
+  .wash-red {
+    --wash-a: #b8342e;
+    --wash-b: #6b1e2e;
+    color: var(--color-cream);
+  }
+  .wash-blue {
+    --wash-a: #5fb4e0;
+    --wash-b: #5fb4e0;
+    color: var(--color-navy);
+  }
+  .wash-navy {
+    --wash-a: #1a2340;
+    --wash-b: #1a2340;
+    color: var(--color-cream);
+  }
+  .wash-cream {
+    --wash-a: #faf7f0;
+    --wash-b: #f5efe0;
+    color: var(--color-burgundy);
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Polaroid strip. The track holds four identical runs, so sliding it by a quarter loops seamlessly. */
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee 70s linear infinite;
+  }
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
   }
 
   /* Long-form copy on the Privacy and Terms pages. */
@@ -116,17 +209,14 @@
   }
 }
 
-@keyframes kenburns {
-  from {
-    transform: scale(1);
-  }
+@keyframes marquee {
   to {
-    transform: scale(1.05);
+    transform: translateX(-25%);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .kenburns {
+  .marquee-track {
     animation: none;
   }
 }

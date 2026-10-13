@@ -26,6 +26,7 @@ export default defineConfig({
       logoAspect,
       shopFront: has('shop-front.jpg'),
       aisle: has('aisle.jpg'),
+      produce: has('produce.jpg'),
     }),
   },
   build: {

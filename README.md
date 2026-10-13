@@ -24,19 +24,20 @@ npm run images   # shrink the photos in public/images to web sizes
 
 ## Design system
 
-The palette is five colours taken from the logo, defined once in `src/index.css`:
-baby blue, cream, burgundy, navy and warm off-white. Nothing else is used.
-Two motifs tie the pages together, both in `src/brand.jsx`: the grape line
-drawings, and `KentePattern`, a faint texture that borrows the geometry of
-Ghanaian Kente cloth in the shop's own colours. The pattern is deliberately
-limited to two places: the band under the hero and behind What We Sell.
+The palette is locked to four colours, defined once in `src/index.css`: baby
+blue `#5FB4E0`, cream `#F5EFE0`, burgundy `#6B1E2E` and deep navy `#1A2340`.
+Lighter shades (such as the off-white used for cards) are tints of those; there
+is no brown, orange, yellow or red anywhere. Two motifs tie the pages together,
+both in `src/brand.jsx`: the grape line drawings, and `KentePattern`, a faint
+texture that borrows the geometry of Ghanaian Kente cloth in burgundy lines
+only. The pattern is deliberately limited to one section: What We Sell.
 
 ## Where things live
 
-- `index.html`: meta tags, LocalBusiness schema, preloader.
+- `index.html`: meta tags, LocalBusiness schema, the storefront opening sequence.
 - `src/shop.js`: shop details (phone, address, hours), shared button and heading styles, the open/closed clock and the cookie choice.
 - `src/brand.jsx`: the logo (with its text fallback), the grape illustrations and the Kente pattern.
 - `src/App.jsx`: the main page sections.
-- `src/extras.jsx`: FAQ, cookie banner, mobile bar and floating buttons.
+- `src/extras.jsx`: polaroid strip, reviews, FAQ, cookie banner, mobile bar and floating buttons.
 - `src/motion.jsx`: shared animation helpers.
-- `src/index.css`: colours, fonts and the scalloped edge.
+- `src/index.css`: colours, fonts, the awning stripe and polaroid washes.

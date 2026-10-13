@@ -17,27 +17,24 @@ export const SHOP = {
   mapEmbed: 'https://www.google.com/maps?q=90+St.+Johns+Ave%2C+London+NW10+4EG&z=16&output=embed',
 }
 
-export const WRAP = 'mx-auto max-w-6xl px-5 sm:px-8'
-const btn =
-  'inline-flex min-h-12 items-center justify-center gap-2.5 rounded-full px-7 text-[0.95rem] font-bold transition-colors duration-200'
-// Burgundy is the call-to-action colour everywhere; it deepens to navy on hover.
-export const btnPrimary = `${btn} bg-burgundy text-cream hover:bg-navy`
-export const btnOutline = `${btn} border-2 border-navy text-navy hover:bg-navy hover:text-cream`
-export const eyebrow = 'text-xs font-bold uppercase tracking-[0.2em] text-burgundy'
-// Section headings are deliberately calm: sentence case, medium size.
-export const heading = 'font-display text-[clamp(1.75rem,4.2vw,2.75rem)] font-semibold leading-[1.1]'
+export const WRAP = 'mx-auto max-w-7xl px-5 sm:px-8'
+export const btn =
+  'inline-flex min-h-12 items-center justify-center gap-2.5 rounded-[3px] text-sm font-bold uppercase tracking-[0.08em] transition-colors duration-200'
+export const eyebrow = 'flex items-center gap-3 text-xs font-bold uppercase tracking-[0.22em]'
 
-// How long the loading screen still has to stay up, in milliseconds, counted
-// from the moment the app is ready. It is shown for at least 1.6 seconds (1
-// second for visitors who prefer reduced motion), measured from when it was
-// first painted, so time already spent downloading counts towards it.
-const MIN_PRELOADER_MS = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1000 : 1600
-export const PRELOADER_MS = document.documentElement.classList.contains('skip-preloader')
-  ? 0
-  : Math.max(0, (window.__preloaderShownAt ?? performance.now()) + MIN_PRELOADER_MS - performance.now())
+// The opening sequence (src/intro.jsx) lasts 2.5 seconds. For the first 1.8 the
+// shop's lights come on (1 second, already lit, for visitors who prefer reduced
+// motion); this is that part, in milliseconds. The view then moves in through
+// the open shopfront and the screen fades over the remaining 0.7.
+const LIGHTS_MS = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1000 : 1800
+export const PRELOADER_MS = document.documentElement.classList.contains('skip-preloader') ? 0 : LIGHTS_MS
 
 // Seconds to hold the hero entrance while the preloader is on screen.
 export const INTRO_DELAY = PRELOADER_MS / 1000
+
+const INTRO_END = performance.now() + PRELOADER_MS
+/** Seconds until the loading screen lifts (0 once it has), so nothing animates behind it. */
+export const introRemaining = () => Math.max(0, INTRO_END - performance.now()) / 1000
 
 const londonClock = new Intl.DateTimeFormat('en-GB', {
   timeZone: 'Europe/London',
