@@ -22,6 +22,10 @@
   --color-sky: #4a9fd0; /* a deeper baby blue, at the top of the hero */
   --color-gold: #d4a017; /* only in the Kente line */
 
+  /* Three layouts: mobile under 768px (below `md`), tablet from 768px to 1024px, and desktop
+     above 1024px (`desk`). Tablets at exactly 1024px wide still get the touch layout. */
+  --breakpoint-desk: 64.0625rem;
+
   --font-hand: 'Caveat', 'Bradley Hand', 'Segoe Script', cursive; /* polaroid captions */
 
   --shadow-soft: 0 1px 2px rgb(26 35 64 / 0.05), 0 12px 28px -16px rgb(26 35 64 / 0.28);
@@ -267,15 +271,15 @@
   .ticker-track {
     animation: ticker 40s linear infinite;
   }
-  /* Polaroid strip: a slower drift, and only on desktop. On phones it is swiped by hand. */
-  @media (min-width: 48rem) {
+  /* Polaroid strip: a slower drift, and only on desktop. On phones and tablets it is swiped by hand. */
+  @media (min-width: 64.0625rem) {
     .marquee-track {
       animation: ticker 140s linear infinite;
     }
   }
 
   /* What We Sell strip on desktop: the cards fade out at both edges, a hint that it scrolls. */
-  @media (min-width: 64rem) {
+  @media (min-width: 64.0625rem) {
     .sell-strip {
       mask-image: linear-gradient(90deg, transparent, #000 2rem, #000 calc(100% - 5rem), transparent);
     }

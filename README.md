@@ -45,6 +45,10 @@ The page is meant to read as one continuous piece, not stacked blocks:
   `src/index.css`.
 - `GrapeWatermark` (`src/brand.jsx`) is the logo's bunch of grapes, used very
   large and faint (about 13% strength) behind the hero, What We Sell and the footer.
+- There are three layouts: mobile under 768px, tablet from 768px to 1024px and
+  desktop above 1024px (the `desk` breakpoint in `src/index.css`). The polaroid
+  strip and the What We Sell strip are swiped on mobile and tablet; the grape
+  watermark is 150px, 250px and 400px wide.
 
 The logo is an SVG drawn from outlines, so it is sharp at any size and needs no
 font. `scripts/logo-paths.mjs` holds its wording, layout and colours and writes

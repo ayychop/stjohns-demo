@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, m, useInView, useReducedMotion } from 'framer-motion'
 import {
+  ArrowRight,
   ArrowUp,
   Banana,
   Carrot,
@@ -46,7 +47,7 @@ function Polaroid({ shot }) {
   const [failed, setFailed] = useState(false)
   const Icon = shot.icon
   return (
-    <figure className="w-56 bg-offwhite p-2.5 shadow-[0_16px_32px_-12px_rgb(26_35_64/0.6)] md:w-48">
+    <figure className="w-[38vw] bg-offwhite p-2 shadow-[0_16px_32px_-12px_rgb(26_35_64/0.6)] md:w-[27vw] md:p-2.5 desk:w-48">
       <div className={`photo wash ${shot.wash} relative aspect-square w-full overflow-hidden`}>
         {/* Thin burgundy bars top and bottom, like a film still. */}
         <div className="absolute inset-0 z-10 border-y-2 border-burgundy" />
@@ -76,8 +77,11 @@ function Polaroid({ shot }) {
 /**
  * Strip of tilted polaroids under the hero. The first time it is on screen the
  * polaroids land one by one (fade, rotate, rise); that never replays. On desktop
- * they overlap and the strip drifts slowly sideways at a constant speed. On
- * phones it is a single run to swipe through, snapping from photo to photo.
+ * (over 1024px) they overlap and the strip drifts slowly sideways at a constant
+ * speed. On phones and tablets it is a single run to swipe through, snapping
+ * from photo to photo, with a "swipe" hint and a row of dots underneath that
+ * follow along. About two and a half polaroids show on a phone, and a little
+ * over three, slightly larger, on a tablet.
  */
 export function PolaroidMarquee() {
   const ref = useRef(null)
@@ -87,31 +91,53 @@ export function PolaroidMarquee() {
   const wait = useRef(null)
   if (inView && wait.current === null) wait.current = introRemaining()
   const Card = reduced ? 'div' : m.div
+  // Which dot is lit on phones and tablets: how far along the strip has been swiped.
+  const [dot, setDot] = useState(0)
+  const onScroll = (e) => {
+    const strip = e.currentTarget
+    const furthest = strip.scrollWidth - strip.clientWidth
+    if (furthest > 0) setDot(Math.round((strip.scrollLeft / furthest) * (POLAROIDS.length - 1)))
+  }
   return (
-    <div
-      ref={ref}
-      aria-hidden="true"
-      className="marquee no-scrollbar relative py-7 max-md:snap-x max-md:snap-mandatory max-md:overflow-x-auto md:overflow-x-clip md:py-8"
-    >
-      <m.div
-        className="marquee-track max-md:px-5"
-        initial="hidden"
-        animate={inView ? 'show' : 'hidden'}
-        transition={{ staggerChildren: 0.1, delayChildren: wait.current ?? 0 }}
+    <div ref={ref} aria-hidden="true">
+      <div
+        onScroll={onScroll}
+        className="marquee no-scrollbar relative py-7 max-desk:snap-x max-desk:snap-mandatory max-desk:overflow-x-auto max-desk:pb-5 desk:overflow-x-clip desk:py-8"
       >
-        {/* Two identical halves of two runs each: the track slides by exactly one half, then repeats. Phones show just the first run. */}
-        {[...POLAROIDS, ...POLAROIDS, ...POLAROIDS, ...POLAROIDS].map((shot, i) => (
-          <Card
-            key={i}
-            className={`mr-4 shrink-0 snap-center last:mr-0 md:-mr-3 md:last:-mr-3 ${i >= POLAROIDS.length ? 'max-md:hidden' : ''}`}
-            {...(reduced
-              ? { style: { transform: `translateY(${shot.drop}px) rotate(${shot.tilt}deg)` } }
-              : { variants: landing, custom: shot })}
-          >
-            <Polaroid shot={shot} />
-          </Card>
-        ))}
-      </m.div>
+        <m.div
+          className="marquee-track px-5 md:px-8 desk:px-0"
+          initial="hidden"
+          animate={inView ? 'show' : 'hidden'}
+          transition={{ staggerChildren: 0.1, delayChildren: wait.current ?? 0 }}
+        >
+          {/* Two identical halves of two runs each: the track slides by exactly one half, then repeats. Phones and tablets show just the first run. */}
+          {[...POLAROIDS, ...POLAROIDS, ...POLAROIDS, ...POLAROIDS].map((shot, i) => (
+            <Card
+              key={i}
+              className={`mr-3 shrink-0 snap-center last:mr-0 md:mr-5 desk:-mr-3 desk:last:-mr-3 ${i >= POLAROIDS.length ? 'max-desk:hidden' : ''}`}
+              {...(reduced
+                ? { style: { transform: `translateY(${shot.drop}px) rotate(${shot.tilt}deg)` } }
+                : { variants: landing, custom: shot })}
+            >
+              <Polaroid shot={shot} />
+            </Card>
+          ))}
+        </m.div>
+      </div>
+      {/* Phones and tablets: a hint that the strip swipes, and where you are along it. */}
+      <div className={`${WRAP} flex items-center justify-between pb-6 desk:hidden`}>
+        <p className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.2em] text-navy/75">
+          Swipe <ArrowRight className="h-4 w-4" />
+        </p>
+        <div className="flex gap-1.5">
+          {POLAROIDS.map((shot, i) => (
+            <span
+              key={shot.src}
+              className={`h-1.5 rounded-full transition-all duration-300 ${i === dot ? 'w-4 bg-burgundy' : 'w-1.5 bg-navy/25'}`}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

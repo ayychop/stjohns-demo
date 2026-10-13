@@ -230,7 +230,8 @@ function Hero({ clock }) {
           <div aria-hidden="true" className="hero-sky absolute inset-0 -z-10 opacity-85" />
         </>
       )}
-      <GrapeWatermark className="absolute -right-20 top-20 -z-10 w-64 text-burgundy opacity-[0.13] sm:-right-28 sm:top-16 sm:w-[400px]" />
+      {/* Three sizes: 150px on phones (a touch fainter), 250px on tablets, 400px on desktop. */}
+      <GrapeWatermark className="absolute -right-10 top-24 -z-10 w-[150px] text-burgundy opacity-[0.11] md:-right-16 md:top-20 md:w-[250px] md:opacity-[0.13] desk:-right-28 desk:top-16 desk:w-[400px]" />
       <div
         aria-hidden="true"
         className="wine-glow absolute -left-[18%] bottom-[14%] -z-10 h-[62%] w-[120%] sm:-left-[10%] sm:w-[78%]"
@@ -246,8 +247,9 @@ function Hero({ clock }) {
         className="cursor-glow pointer-events-none absolute -left-[300px] -top-[300px] -z-10 hidden h-[600px] w-[600px] will-change-transform lg:block"
       />
 
-      {/* A touch short of the full screen so the ticker band peeks over the fold. */}
-      <div className={`${WRAP} flex min-h-[calc(100svh-2.5rem)] flex-col pt-28 sm:pt-34`}>
+      {/* A touch short of the full screen so the ticker band peeks over the fold. On a tablet held
+          upright the screen is very tall, so the height is capped to keep the headline near the top. */}
+      <div className={`${WRAP} flex min-h-[calc(100svh-2.5rem)] flex-col pt-28 sm:pt-34 md:max-desk:min-h-[min(calc(100svh-2.5rem),46rem)]`}>
         <m.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -429,7 +431,7 @@ function WhatWeSell() {
   return (
     <section id="what-we-sell" className="relative isolate overflow-clip bg-linear-to-b from-cream to-sand">
       <div aria-hidden="true" className="carnival-stripe" />
-      <GrapeWatermark className="absolute -bottom-20 -left-24 -z-10 w-64 text-burgundy opacity-[0.13] sm:-left-28 sm:w-[400px]" />
+      <GrapeWatermark className="absolute -bottom-8 -left-10 -z-10 w-[150px] text-burgundy opacity-[0.11] md:-bottom-12 md:-left-16 md:w-[250px] md:opacity-[0.13] desk:-bottom-20 desk:-left-28 desk:w-[400px]" />
       <div className={`${WRAP} pt-12 md:pt-16`}>
         <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-4">
           <div>
@@ -466,7 +468,7 @@ function WhatWeSell() {
           onPointerMove={onPointerMove}
           onPointerUp={endDrag}
           onPointerLeave={endDrag}
-          className="sell-strip no-scrollbar flex scroll-px-5 gap-4 overflow-x-auto px-5 py-6 select-none max-lg:snap-x max-lg:snap-mandatory sm:scroll-px-8 sm:px-8 lg:cursor-grab lg:pl-[max(2rem,calc(50vw-38rem))] lg:pr-[max(5rem,calc(50vw-38rem))] lg:active:cursor-grabbing [&_img]:pointer-events-none"
+          className="sell-strip no-scrollbar flex scroll-px-5 gap-4 overflow-x-auto px-5 py-6 select-none max-desk:snap-x max-desk:snap-mandatory sm:scroll-px-8 sm:px-8 desk:cursor-grab desk:pl-[max(2rem,calc(50vw-38rem))] desk:pr-[max(5rem,calc(50vw-38rem))] desk:active:cursor-grabbing [&_img]:pointer-events-none"
         >
           {PRODUCTS.map(({ label, text, src }) => (
             // Floats on a warm shadow; lifts on hover as the shadow deepens.
@@ -684,7 +686,7 @@ function Footer({ onCookieSettings }) {
     <footer className="relative isolate overflow-hidden bg-navy text-cream">
       {/* Burgundy, like the other watermarks. It needs far more strength here than their 5%: burgundy
           and navy are both dark, so anything fainter cannot be seen at all. */}
-      <GrapeWatermark className="absolute left-1/2 top-1/2 -z-10 w-72 -translate-x-1/2 -translate-y-1/2 text-burgundy opacity-35 sm:w-[420px]" />
+      <GrapeWatermark className="absolute left-1/2 top-1/2 -z-10 w-[150px] -translate-x-1/2 -translate-y-1/2 text-burgundy opacity-25 md:w-[260px] md:opacity-30 desk:w-[420px] desk:opacity-35" />
       {/* Extra room at the bottom on phones so the floating buttons never cover the credit. */}
       <div className={`${WRAP} pb-24 pt-8 md:pb-12`}>
         <p className="font-display text-[clamp(2rem,6vw,4.5rem)] font-black uppercase leading-[0.95]">
