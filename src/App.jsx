@@ -1,12 +1,12 @@
-import { useRef } from 'react'
-import { MotionConfig, motion, useInView } from 'framer-motion'
+import { useState } from 'react'
+import { LazyMotion, MotionConfig, domAnimation, m, useMotionValueEvent, useScroll } from 'framer-motion'
 import {
-  Apple,
+  ArrowRight,
   Bus,
-  CalendarCheck,
-  Clock,
+  Carrot,
   CreditCard,
-  Heart,
+  Flame,
+  ListChecks,
   MapPin,
   Navigation,
   Newspaper,
@@ -15,117 +15,130 @@ import {
   Receipt,
   ShoppingBasket,
   Smartphone,
+  Smile,
   Star,
-  Store,
-  Sun,
+  Sunrise,
   Tv,
   Users,
-  Utensils,
+  Wheat,
   Wine,
 } from 'lucide-react'
-import { Counter, Magnetic, Reveal, ShopImage, useSmoothScroll } from './motion.jsx'
+import { Counter, Magnetic, MaskLines, Reveal, ShopImage, useSmoothScroll } from './motion.jsx'
+import { CookieBanner, Faq, FloatingActions, MobileBar, PolaroidMarquee, Reviews } from './extras.jsx'
+import { INTRO_DELAY, SHOP, WRAP, btn, eyebrow, useCookieConsent, useShopClock } from './shop.js'
 
-const SHOP = {
-  name: "St. John's Mini Market",
-  tagline: 'Food & Wine',
-  phone: '020 8965 9565',
-  tel: 'tel:+442089659565',
-  address: '90 St. Johns Ave, London NW10 4EG',
-  directions:
-    'https://www.google.com/maps/dir/?api=1&destination=90+St.+Johns+Ave%2C+London+NW10+4EG',
-  mapEmbed: 'https://www.google.com/maps?q=90+St.+Johns+Ave%2C+London+NW10+4EG&z=16&output=embed',
-}
+// If you add dedicated shelf photos, point `src` at them here.
+const SHELVES = [
+  {
+    title: 'Caribbean shelf',
+    list: 'Rice, peas, plantain, seasoning, spice',
+    text: 'Everything for Sunday dinner, the way it is meant to be made.',
+    src: '/images/aisle.jpg',
+    crop: 'object-left',
+    alt: 'Caribbean groceries on the shelves',
+    aspect: 'aspect-[4/5]',
+    offset: '',
+  },
+  {
+    title: 'Polish shelf',
+    list: 'Deli, sweets, breads, pickles, cured meats',
+    text: 'A proper taste of home, a few doors from yours.',
+    src: '/images/aisle.jpg',
+    crop: 'object-right',
+    alt: 'Polish foods on the shelves',
+    aspect: 'aspect-[4/5] lg:aspect-[3/4]',
+    offset: 'lg:mt-28',
+  },
+  {
+    title: 'Fresh every morning',
+    list: 'Fruit, veg, herbs picked daily',
+    text: 'Set out front before most of the street is awake.',
+    src: '/images/produce.jpg',
+    crop: '',
+    alt: 'Fresh fruit and vegetables on display outside the shop',
+    aspect: 'aspect-[4/5]',
+    offset: 'lg:mt-12',
+  },
+]
 
 const PRODUCTS = [
-  { icon: Wine, label: 'Off Licence' },
-  { icon: Newspaper, label: 'News Agents' },
-  { icon: ShoppingBasket, label: 'Groceries' },
-  { icon: Utensils, label: 'Polish Foods' },
-  { icon: Sun, label: 'Caribbean Foods' },
-  { icon: Apple, label: 'Fruit & Veg' },
-  { icon: CreditCard, label: 'PayPoint' },
-  { icon: Smartphone, label: 'Mobile Top-ups' },
+  { icon: Wine, label: 'Off Licence', text: 'Beers, wines and spirits' },
+  { icon: Newspaper, label: 'News Agents', text: 'Papers and magazines' },
+  { icon: ShoppingBasket, label: 'Groceries', text: 'The everyday basics' },
+  { icon: Wheat, label: 'Polish Foods', text: 'Deli, breads and pickles' },
+  { icon: Flame, label: 'Caribbean Foods', text: 'Seasoning, spice and staples' },
+  { icon: Carrot, label: 'Fruit & Veg', text: 'Fresh every morning' },
+  { icon: CreditCard, label: 'PayPoint', text: 'Sorted at the counter' },
+  { icon: Smartphone, label: 'Mobile Top-ups', text: 'Credit while you shop' },
 ]
 
 const REASONS = [
   {
-    icon: CalendarCheck,
-    title: (
-      <>
-        Open <Counter to={7} duration={0.8} /> days a week
-      </>
-    ),
-    text: 'Early mornings to late nights, 7am to 11pm, every single day.',
+    icon: Sunrise,
+    title: 'Open before the buses start, shut long after the last train',
+    text: 'Seven in the morning until eleven at night, every day. If you have run out of something, we are probably open.',
   },
   {
-    icon: Store,
-    title: 'Everything under one roof',
-    text: 'Groceries, drinks, papers, bills and top-ups in one quick trip.',
+    icon: ListChecks,
+    title: 'One shop, every errand',
+    text: 'Milk, a paper, the meter, a parcel to pick up. One trip and you are done.',
+  },
+  {
+    icon: Smile,
+    title: 'Faces you know behind the counter',
+    text: 'We know our regulars, and it does not take long to become one.',
   },
   {
     icon: Users,
-    title: 'Serving the NW10 community',
-    text: 'A proper local shop for Church End, Roundwood and the streets around.',
-  },
-  {
-    icon: Heart,
-    title: 'Friendly local service',
-    text: 'Familiar faces behind the counter who are always happy to help.',
+    title: 'Every neighbour, every shelf',
+    text: 'Caribbean, Polish and everything in between, stocked for the people who actually live here.',
   },
 ]
 
 const SERVICES = [
-  { icon: CreditCard, label: 'PayPoint', text: 'Pay bills and top up gas and electric.' },
-  { icon: Bus, label: 'Bus Tickets', text: 'Grab your bus pass on the way.' },
-  { icon: Tv, label: 'TV Licence', text: 'Pay your TV licence over the counter.' },
-  { icon: Smartphone, label: 'Mobile Top-ups', text: 'All the major UK networks.' },
-  { icon: Receipt, label: 'Oyster Top-ups', text: 'Add credit before you travel.' },
-  { icon: Package, label: 'Amazon Click & Collect', text: 'Pick up parcels when it suits you.' },
+  { icon: CreditCard, label: 'PayPoint' },
+  { icon: Bus, label: 'Bus Tickets' },
+  { icon: Tv, label: 'TV Licence' },
+  { icon: Smartphone, label: 'Mobile Top-ups' },
+  { icon: Receipt, label: 'Oyster Top-ups' },
+  { icon: Package, label: 'Amazon Click & Collect' },
 ]
 
 const NAV = [
+  { href: '#neighbourhood', label: 'The Shelves' },
   { href: '#what-we-sell', label: 'What We Sell' },
-  { href: '#services', label: 'Services' },
+  { href: '#reviews', label: 'Reviews' },
   { href: '#hours', label: 'Hours' },
   { href: '#find-us', label: 'Find Us' },
 ]
 
-const btn =
-  'inline-flex items-center justify-center gap-2 rounded-full font-bold transition-colors duration-200'
-const btnRed = `${btn} bg-accent text-white shadow-soft hover:bg-accent-dark`
-const btnBlue = `${btn} bg-brand text-white shadow-soft hover:bg-brand-dark`
-
-function SectionHeading({ eyebrow, title, intro, center = true }) {
+/** Pulsing dot: green while the shop is open, red while it is closed. */
+function StatusDot({ open }) {
+  const colour = open ? 'bg-[#3ddc84]' : 'bg-[#ff5a4d]'
   return (
-    <Reveal className={center ? 'mx-auto max-w-2xl text-center' : 'max-w-xl'}>
-      <p className="text-sm font-bold uppercase tracking-[0.16em] text-accent">{eyebrow}</p>
-      <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-brand sm:text-4xl lg:text-5xl">
-        {title}
-      </h2>
-      {intro && <p className="mt-4 text-lg text-muted">{intro}</p>}
-    </Reveal>
+    <span className="relative flex h-2.5 w-2.5">
+      <span
+        className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-75 motion-reduce:hidden ${colour}`}
+      />
+      <span className={`relative inline-flex h-2.5 w-2.5 rounded-full ${colour}`} />
+    </span>
   )
 }
 
 function Header({ frosted }) {
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-50 border-b transition-all duration-300 ${
+      className={`fixed inset-x-0 top-0 z-50 border-b transition-colors duration-300 ${
         frosted
-          ? 'border-brand/10 bg-cream/70 shadow-soft backdrop-blur-xl backdrop-saturate-150'
-          : 'border-transparent bg-transparent'
+          ? 'border-ink/15 bg-cream/75 text-ink backdrop-blur-xl backdrop-saturate-150'
+          : 'border-transparent text-cream'
       }`}
     >
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5 sm:h-[4.5rem] sm:px-8">
-        <a href="#top" className="flex min-w-0 items-center gap-3">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand text-sm font-extrabold text-cream">
-            SJ
-          </span>
-          <span className="min-w-0 leading-tight">
-            <span className="block text-sm font-extrabold text-brand sm:text-lg">
-              {SHOP.name}
-            </span>
-            <span className="hidden text-xs font-semibold text-accent sm:block">{SHOP.tagline}</span>
+      <div className={`${WRAP} flex h-16 items-center justify-between gap-4 sm:h-[4.5rem]`}>
+        <a href="#top" className="leading-none transition-opacity hover:opacity-80">
+          <span className="font-display block text-xl font-bold sm:text-2xl">St. John's</span>
+          <span className="mt-1 block text-[0.6rem] font-bold uppercase tracking-[0.3em]">
+            Mini Market
           </span>
         </a>
 
@@ -134,14 +147,17 @@ function Header({ frosted }) {
             <a
               key={item.href}
               href={item.href}
-              className="text-sm font-semibold text-ink/80 transition-colors hover:text-brand"
+              className="border-b-2 border-transparent py-1 text-xs font-bold uppercase tracking-[0.16em] transition-colors hover:border-clay"
             >
               {item.label}
             </a>
           ))}
         </nav>
 
-        <a href={SHOP.tel} className={`${btnRed} shrink-0 px-4 py-2.5 text-sm sm:px-5`}>
+        <a
+          href={SHOP.tel}
+          className={`${btn} !min-h-11 shrink-0 bg-clay px-4 text-white hover:bg-clay-dark sm:px-5`}
+        >
           <Phone className="h-4 w-4" aria-hidden="true" />
           Call Now
         </a>
@@ -150,115 +166,157 @@ function Header({ frosted }) {
   )
 }
 
-function Hero({ heroRef }) {
+function Hero({ clock }) {
   return (
-    <section id="top" ref={heroRef} className="relative overflow-hidden pt-24 sm:pt-32">
-      <div
-        aria-hidden="true"
-        className="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-brand-soft blur-3xl"
+    <section id="top" className="relative isolate overflow-hidden bg-ink text-cream">
+      <ShopImage
+        src="/images/shop-front.jpg"
+        alt="The shop front of St. John's Mini Market with its red awning"
+        tone="dark"
+        className="!absolute inset-0 -z-20"
+        imgClassName="kenburns"
+        eager
       />
       <div
         aria-hidden="true"
-        className="absolute -left-24 bottom-0 h-72 w-72 rounded-full bg-accent-soft blur-3xl"
+        className="absolute inset-0 -z-10 bg-gradient-to-t from-ink via-ink/75 to-ink/60"
       />
 
-      <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-5 pb-16 sm:px-8 sm:pb-24 lg:grid-cols-[1.05fr_1fr] lg:gap-14">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
+      {/* A touch short of the full screen so the polaroids peek over the fold. */}
+      <div className={`${WRAP} flex min-h-[calc(100svh-2.5rem)] flex-col pt-24 sm:pt-28`}>
+        <m.div
+          initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.6, delay: INTRO_DELAY + 0.5 }}
+          className="flex flex-wrap gap-2 text-xs font-semibold tracking-wide sm:text-sm"
         >
-          <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-bold text-ink shadow-soft">
-            <Star className="h-4 w-4 fill-sun text-sun" aria-hidden="true" />
+          <p className="inline-flex items-center gap-2.5 border border-cream/30 bg-ink/50 px-3.5 py-2 backdrop-blur-sm">
+            <StatusDot open={clock.open} />
+            <span className="font-bold uppercase tracking-[0.12em]">
+              {clock.open ? 'Open now' : 'Closed'}
+            </span>
+            <span className="text-cream/80" aria-hidden="true">·</span>
+            <span className="font-mono tabular-nums">
+              <span className="sr-only">Time in London: </span>
+              {clock.time}
+            </span>
+          </p>
+          <p className="inline-flex items-center gap-2 border border-cream/30 bg-ink/50 px-3.5 py-2 backdrop-blur-sm">
+            <Star className="h-4 w-4 fill-mustard text-mustard" aria-hidden="true" />
             <span>
-              <Counter to={4.2} decimals={1} /> stars · <Counter to={27} /> reviews
+              <Counter to={SHOP.rating} decimals={1} /> on Google ·{' '}
+              <Counter to={SHOP.reviewCount} /> reviews
             </span>
-            <span className="font-medium text-muted">on Google</span>
-          </div>
+          </p>
+        </m.div>
 
-          <h1 className="mt-6 text-[2.75rem] font-extrabold leading-[1.02] tracking-tight text-brand sm:text-6xl lg:text-7xl">
-            St. John's
-            <br />
-            Mini Market
+        <div className="mt-auto pb-8 pt-10 sm:pb-10">
+          {/* No entrance animation here: the headline is in place the moment the preloader lifts,
+              which also keeps Largest Contentful Paint early. */}
+          <h1 className="font-display text-[clamp(2.6rem,min(11.5vw,15svh),9.5rem)] font-black uppercase leading-[0.88]">
+            <span className="block">St. John's</span>
+            <span className="block">Mini Market</span>
           </h1>
-          <p className="mt-4 text-2xl font-extrabold text-accent sm:text-3xl">{SHOP.tagline}</p>
-          <p className="mt-5 max-w-lg text-lg text-muted">
-            Your friendly corner shop on St. Johns Avenue, proudly serving the NW10 community with
-            fresh food, cold drinks and everyday essentials, from early morning until late.
-          </p>
-
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
-            <Magnetic>
-              <a href={SHOP.tel} className={`${btnRed} w-full px-7 py-4 text-base sm:w-auto`}>
-                <Phone className="h-5 w-5" aria-hidden="true" />
-                Call Us
-              </a>
-            </Magnetic>
-            <Magnetic>
-              <a
-                href={SHOP.directions}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`${btnBlue} w-full px-7 py-4 text-base sm:w-auto`}
-              >
-                <Navigation className="h-5 w-5" aria-hidden="true" />
-                Get Directions
-              </a>
-            </Magnetic>
-          </div>
-
-          <p className="mt-6 flex items-center gap-2 text-sm font-semibold text-ink/80">
-            <Clock className="h-4 w-4 text-brand" aria-hidden="true" />
-            Open every day, 7:00am to 11:00pm
-          </p>
-        </motion.div>
-
-        <div className="relative">
-          <ShopImage
-            src="/images/shop-front.jpg"
-            alt="The shop front of St. John's Mini Market on St. Johns Avenue"
-            label="Shop front photo"
-            className="aspect-[4/3] rounded-[2rem] shadow-lift lg:aspect-[4/5]"
-            scaleIn
-            eager
+          <MaskLines
+            as="p"
+            immediate
+            delay={INTRO_DELAY + 0.2}
+            lines={['Food · Wine · Everything in between.']}
+            className="font-display mt-5 text-[clamp(1.25rem,3.6vw,3rem)] font-medium italic leading-tight text-mustard"
           />
-          <div className="absolute -bottom-5 left-5 flex items-center gap-3 rounded-2xl bg-white px-4 py-3 shadow-lift sm:left-8">
-            <span className="grid h-10 w-10 place-items-center rounded-xl bg-accent-soft text-accent">
-              <MapPin className="h-5 w-5" aria-hidden="true" />
+
+          <m.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: INTRO_DELAY + 0.45, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <p className="mt-6 max-w-xl text-base leading-relaxed text-cream/85 sm:text-lg">
+              A corner shop in Harlesden since forever. Serving the NW10 community morning to night.
+            </p>
+
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
+              <Magnetic>
+                <a
+                  href={SHOP.tel}
+                  className={`${btn} w-full bg-clay px-7 py-4 text-white hover:bg-clay-dark sm:w-auto`}
+                >
+                  <Phone className="h-4 w-4" aria-hidden="true" />
+                  Call {SHOP.phone}
+                </a>
+              </Magnetic>
+              <Magnetic>
+                <a
+                  href={SHOP.directions}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`${btn} w-full border-2 border-cream px-7 py-[0.875rem] text-cream hover:bg-cream hover:text-ink sm:w-auto`}
+                >
+                  <Navigation className="h-4 w-4" aria-hidden="true" />
+                  Get Directions
+                </a>
+              </Magnetic>
+            </div>
+          </m.div>
+        </div>
+
+        <div className="flex items-center justify-between gap-4 border-t border-cream/25 py-4 font-mono text-[0.7rem] uppercase tracking-[0.2em] text-cream/80 sm:text-xs">
+          <p className="flex items-center gap-2.5">
+            <span className="h-1.5 w-1.5 bg-mustard" aria-hidden="true" />
+            <span>
+              Open <Counter to={7} duration={0.8} /> days · 7:00am–11:00pm
             </span>
-            <span className="text-sm leading-tight">
-              <span className="block font-extrabold text-brand">90 St. Johns Ave</span>
-              <span className="text-muted">London NW10 4EG</span>
-            </span>
-          </div>
+          </p>
+          <p className="hidden sm:block">90 St. Johns Ave · NW10 4EG</p>
         </div>
       </div>
+
+      {/* Room for the top of the polaroid strip, which overlaps from below. */}
+      <div aria-hidden="true" className="h-20 sm:h-24" />
+      <div aria-hidden="true" className="awning h-3 sm:h-4" />
     </section>
   )
 }
 
-function WhatWeSell() {
+function Neighbourhood() {
   return (
-    <section id="what-we-sell" className="px-5 py-16 sm:px-8 sm:py-24">
-      <div className="mx-auto max-w-6xl">
-        <SectionHeading
-          eyebrow="What we sell"
-          title="All your everyday essentials"
-          intro="From the weekly basics to a taste of home, the shelves are stocked for the whole neighbourhood."
+    <section id="neighbourhood" className="pb-20 pt-10 sm:pb-28 sm:pt-14">
+      <div className={WRAP}>
+        <Reveal as="p" className={eyebrow}>
+          <span className="h-0.5 w-8 bg-clay" aria-hidden="true" />
+          Who we stock for
+        </Reveal>
+        <MaskLines
+          lines={['Stocked for the', 'neighbourhood']}
+          className="font-display mt-5 text-[clamp(1.9rem,8.7vw,6rem)] font-black uppercase leading-[0.92]"
         />
-        <ul className="mt-10 grid grid-cols-2 gap-4 sm:mt-14 sm:gap-5 lg:grid-cols-4">
-          {PRODUCTS.map(({ icon: Icon, label }, i) => (
-            <Reveal as="li" key={label} delay={(i % 4) * 0.06}>
-              <motion.div
-                whileHover={{ y: -6 }}
-                transition={{ type: 'spring', stiffness: 320, damping: 22 }}
-                className="group flex h-full flex-col items-center gap-4 rounded-3xl bg-white p-6 text-center shadow-soft transition-shadow duration-300 hover:shadow-glow sm:p-8"
+        <Reveal as="p" delay={0.15} className="mt-6 max-w-md text-lg leading-relaxed text-ink/75 lg:ml-auto lg:mt-2">
+          Caribbean, African, Polish, Irish. Harlesden cooks in a lot of kitchens, and our shelves
+          are filled with all of them in mind.
+        </Reveal>
+
+        <ul className="mt-12 grid gap-12 lg:-mt-6 lg:grid-cols-3 lg:gap-8">
+          {SHELVES.map((shelf, i) => (
+            <Reveal as="li" key={shelf.title} delay={i * 0.1} className={shelf.offset}>
+              <m.article
+                whileHover={{ y: -8 }}
+                transition={{ type: 'spring', stiffness: 260, damping: 22 }}
               >
-                <span className="grid h-14 w-14 place-items-center rounded-2xl bg-brand-soft text-brand transition-colors duration-300 group-hover:bg-brand group-hover:text-white sm:h-16 sm:w-16">
-                  <Icon className="h-7 w-7" strokeWidth={1.9} aria-hidden="true" />
-                </span>
-                <span className="text-base font-bold text-ink sm:text-lg">{label}</span>
-              </motion.div>
+                <ShopImage
+                  src={shelf.src}
+                  alt={shelf.alt}
+                  className={`${shelf.aspect} w-full`}
+                  imgClassName={shelf.crop}
+                />
+                {/* Photo on top and copy beneath on phones; the caption overlaps the photo on desktop. */}
+                <div className="relative mt-5 bg-cream lg:-mt-12 lg:ml-6 lg:mr-8 lg:p-6 lg:pb-0">
+                  <p className="font-mono text-xs tracking-[0.2em]">0{i + 1}</p>
+                  <h3 className="font-display mt-2 text-3xl font-bold leading-none sm:text-4xl">
+                    {shelf.title}
+                  </h3>
+                  <p className="mt-3 text-sm font-bold uppercase tracking-[0.08em]">{shelf.list}</p>
+                  <p className="mt-2 leading-relaxed text-ink/75">{shelf.text}</p>
+                </div>
+              </m.article>
             </Reveal>
           ))}
         </ul>
@@ -267,42 +325,103 @@ function WhatWeSell() {
   )
 }
 
+function WhatWeSell() {
+  return (
+    <section id="what-we-sell" className="border-t-2 border-ink pb-24 pt-14 sm:pb-36 sm:pt-20">
+      <div className={WRAP}>
+        <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-4">
+          <MaskLines
+            lines={['What we sell']}
+            className="font-display text-[clamp(2.3rem,7.5vw,6rem)] font-black uppercase leading-[0.92]"
+          />
+          <Reveal as="p" className="flex items-center gap-2 pb-2 font-mono text-xs uppercase tracking-[0.2em] text-ink/75 lg:hidden">
+            Swipe along <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Reveal>
+          <Reveal as="p" className="hidden max-w-xs pb-3 text-ink/75 lg:block">
+            Eight good reasons to pop in, and usually a ninth you had forgotten you needed.
+          </Reveal>
+        </div>
+      </div>
+
+      {/* Swipeable strip on phones and tablets, an eight-up index on desktop. */}
+      <Reveal className="mx-auto mt-10 max-w-7xl lg:px-8">
+        <ul className="no-scrollbar flex snap-x snap-mandatory overflow-x-auto px-5 sm:px-8 lg:grid lg:grid-cols-4 lg:overflow-visible lg:border-l lg:border-t lg:border-ink/20 lg:px-0">
+          {PRODUCTS.map(({ icon: Icon, label, text }, i) => (
+            <m.li
+              key={label}
+              whileHover={{ y: -6 }}
+              transition={{ type: 'spring', stiffness: 320, damping: 24 }}
+              className="group relative flex min-h-60 w-[70vw] max-w-xs shrink-0 snap-start flex-col justify-between border-y border-r border-ink/20 bg-cream p-6 transition-colors duration-300 first:border-l hover:z-10 hover:bg-ink hover:text-cream hover:shadow-lift sm:w-64 lg:min-h-64 lg:w-auto lg:max-w-none lg:border-t-0 lg:p-7 lg:first:border-l-0"
+            >
+              <div className="flex items-start justify-between">
+                <Icon
+                  className="h-10 w-10 text-ink transition-colors duration-300 group-hover:text-mustard"
+                  strokeWidth={1.4}
+                  aria-hidden="true"
+                />
+                <span className="font-mono text-xs tracking-[0.2em] opacity-75" aria-hidden="true">
+                  0{i + 1}
+                </span>
+              </div>
+              <div>
+                <h3 className="font-display text-[1.75rem] font-bold leading-none lg:text-3xl">{label}</h3>
+                <p className="mt-2 text-sm opacity-80">{text}</p>
+              </div>
+            </m.li>
+          ))}
+        </ul>
+      </Reveal>
+    </section>
+  )
+}
+
 function WhyShop() {
   return (
-    <section id="why-us" className="bg-cream-deep px-5 py-16 sm:px-8 sm:py-24">
-      <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2 lg:gap-16">
-        <Reveal className="grid grid-cols-5 items-end gap-4">
-          <ShopImage
-            src="/images/aisle.jpg"
-            alt="Well stocked aisle inside the shop"
-            label="Aisle photo"
-            className="col-span-3 aspect-[3/4] rounded-[2rem] shadow-lift"
-          />
-          <ShopImage
-            src="/images/produce.jpg"
-            alt="Fresh fruit and vegetables on display"
-            label="Produce photo"
-            className="col-span-2 aspect-square rounded-[1.5rem] shadow-soft"
-          />
+    <section id="why-us" className="bg-mustard">
+      <div className={`${WRAP} grid gap-10 pb-20 sm:pb-28 lg:grid-cols-12 lg:gap-14`}>
+        {/* The photo climbs out of the top of the block into the section above. */}
+        <Reveal className="-mt-12 sm:-mt-20 lg:col-span-5">
+          <div className="relative">
+            <div aria-hidden="true" className="absolute -bottom-3 -right-3 h-full w-full bg-ink" />
+            <ShopImage
+              src="/images/aisle.jpg"
+              alt="Well stocked aisle inside St. John's Mini Market"
+              className="aspect-[4/3] w-full lg:aspect-[4/5]"
+            />
+          </div>
+          <p className="mt-7 font-mono text-xs uppercase tracking-[0.2em]">Inside · 90 St. Johns Ave</p>
         </Reveal>
 
-        <div>
-          <SectionHeading
-            center={false}
-            eyebrow="Why shop with us"
-            title="Your local, done properly"
+        <div className="lg:col-span-7 lg:pt-24">
+          <Reveal as="p" className={eyebrow}>
+            <span className="h-0.5 w-8 bg-ink" aria-hidden="true" />
+            Why shop with us
+          </Reveal>
+          <MaskLines
+            lines={['Your local,', 'done properly']}
+            className="font-display mt-5 text-[clamp(2.3rem,6.5vw,5rem)] font-black uppercase leading-[0.92]"
           />
-          <ul className="mt-8 grid gap-4 sm:grid-cols-2">
+          <ol className="mt-10 border-t-2 border-ink">
             {REASONS.map(({ icon: Icon, title, text }, i) => (
-              <Reveal as="li" key={i} delay={i * 0.07} className="rounded-3xl bg-white p-6 shadow-soft">
-                <span className="grid h-11 w-11 place-items-center rounded-xl bg-accent-soft text-accent">
-                  <Icon className="h-5 w-5" aria-hidden="true" />
+              <Reveal
+                as="li"
+                key={title}
+                delay={i * 0.06}
+                className="grid grid-cols-[auto_1fr] gap-x-5 border-b border-ink/30 py-6 sm:gap-x-8 sm:py-7"
+              >
+                <span className="font-display text-4xl font-black italic leading-none sm:text-5xl" aria-hidden="true">
+                  {i + 1}
                 </span>
-                <h3 className="mt-4 text-lg font-extrabold text-brand">{title}</h3>
-                <p className="mt-1.5 text-[0.95rem] leading-relaxed text-muted">{text}</p>
+                <div>
+                  <h3 className="font-display flex gap-3 text-2xl font-bold leading-[1.1] sm:text-[1.75rem]">
+                    <span className="flex-1">{title}</span>
+                    <Icon className="mt-0.5 h-6 w-6 shrink-0" strokeWidth={1.6} aria-hidden="true" />
+                  </h3>
+                  <p className="mt-2 max-w-lg leading-relaxed">{text}</p>
+                </div>
               </Reveal>
             ))}
-          </ul>
+          </ol>
         </div>
       </div>
     </section>
@@ -311,135 +430,173 @@ function WhyShop() {
 
 function Services() {
   return (
-    <section id="services" className="px-5 py-16 sm:px-8 sm:py-24">
-      <div className="mx-auto max-w-6xl">
-        <SectionHeading
-          eyebrow="Services"
-          title="More than just a shop"
-          intro="Sort the errands while you pick up the milk."
-        />
-        <ul className="mt-10 grid gap-4 sm:mt-14 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
-          {SERVICES.map(({ icon: Icon, label, text }, i) => (
-            <Reveal
-              as="li"
+    <section id="services" className="bg-ink pb-36 pt-14 text-cream sm:pb-44 sm:pt-16">
+      <div className={WRAP}>
+        <div className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-2">
+          <MaskLines
+            lines={['Also at the counter']}
+            className="font-display text-3xl font-bold italic sm:text-4xl"
+          />
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-cream/70">Just ask</p>
+        </div>
+        {/* A plain vertical list on phones, one band of six on desktop. */}
+        <Reveal
+          as="ul"
+          className="mt-8 border-t border-cream/20 sm:grid sm:grid-cols-3 sm:border-l lg:grid-cols-6"
+        >
+          {SERVICES.map(({ icon: Icon, label }) => (
+            <li
               key={label}
-              delay={(i % 3) * 0.06}
-              className="flex items-center gap-4 rounded-3xl border border-brand/10 bg-white p-5 shadow-soft"
+              className="flex items-center gap-4 border-b border-cream/20 py-4 transition-colors duration-200 hover:bg-cream/5 sm:flex-col sm:items-start sm:border-r sm:px-5 sm:py-7"
             >
-              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-brand text-white">
-                <Icon className="h-6 w-6" strokeWidth={1.9} aria-hidden="true" />
+              <Icon className="h-7 w-7 shrink-0 text-mustard" strokeWidth={1.5} aria-hidden="true" />
+              <span className="text-base font-bold uppercase leading-snug tracking-[0.06em] sm:text-sm">
+                {label}
               </span>
-              <span>
-                <span className="block text-base font-extrabold text-ink">{label}</span>
-                <span className="text-sm text-muted">{text}</span>
-              </span>
-            </Reveal>
+            </li>
           ))}
-        </ul>
+        </Reveal>
       </div>
     </section>
   )
 }
 
-function Hours() {
+function Hours({ clock }) {
   return (
-    <section id="hours" className="px-5 pb-16 sm:px-8 sm:pb-24">
-      <Reveal className="relative mx-auto max-w-4xl overflow-hidden rounded-[2.5rem] bg-brand px-6 py-12 text-center text-white shadow-lift sm:px-12 sm:py-16">
-        <div
-          aria-hidden="true"
-          className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-white/10"
-        />
-        <div
-          aria-hidden="true"
-          className="absolute -bottom-20 -left-10 h-56 w-56 rounded-full bg-accent/40 blur-2xl"
-        />
-        <div className="relative">
-          <span className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-1.5 text-sm font-bold">
-            <span className="h-2 w-2 rounded-full bg-white" aria-hidden="true" />
-            Open <Counter to={7} duration={0.8} /> days
-          </span>
-          <h2 className="mt-6 text-sm font-bold uppercase tracking-[0.16em] text-white/70">
-            Opening hours
-          </h2>
-          <p className="mt-3 text-2xl font-bold text-white/90 sm:text-3xl">Monday to Sunday</p>
-          <p className="mt-2 text-4xl font-extrabold tracking-tight sm:text-6xl lg:text-7xl">
-            7:00am to 11:00pm
-          </p>
-          <p className="mx-auto mt-5 max-w-md text-white/75">
-            Same hours every day of the week, so we are here whenever you need us.
-          </p>
+    <section id="hours" className={`${WRAP} -mt-24 sm:-mt-28`}>
+      <Reveal className="relative">
+        <div aria-hidden="true" className="absolute -bottom-3 -right-3 hidden h-full w-full bg-mustard sm:block" />
+        <div className="relative grid gap-8 bg-clay px-6 py-10 text-white sm:px-12 sm:py-14 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div>
+            <p className="inline-flex items-center gap-2.5 bg-ink px-3.5 py-2 font-mono text-xs font-bold uppercase tracking-[0.2em] text-cream">
+              <StatusDot open={clock.open} />
+              {clock.open ? 'Open now' : 'Closed · Back at 7am'}
+            </p>
+            <h2 className="mt-6">
+              <span className="sr-only">Opening hours: </span>
+              <MaskLines
+                as="span"
+                lines={['7am – 11pm']}
+                className="font-display block text-[clamp(3.2rem,13vw,10rem)] font-black uppercase leading-[0.9] text-cream"
+              />
+              <span className="font-display mt-2 block text-[clamp(1.6rem,4.5vw,3.5rem)] font-medium italic leading-tight text-ink">
+                Every single day
+              </span>
+            </h2>
+          </div>
+          <div className="flex items-end gap-4 border-t border-white/40 pt-6 lg:flex-col lg:items-end lg:border-l lg:border-t-0 lg:pl-12 lg:pt-0 lg:text-right">
+            <span className="font-display text-7xl font-black leading-[0.8] text-cream sm:text-9xl">
+              <Counter to={7} duration={0.9} />
+            </span>
+            <span className="pb-1 text-sm font-bold uppercase leading-snug tracking-[0.14em]">
+              days a week
+              <br />
+              Monday to Sunday
+            </span>
+          </div>
         </div>
       </Reveal>
     </section>
   )
 }
 
-function FindUs() {
+function FindUs({ consent, setConsent }) {
   return (
-    <section id="find-us" className="bg-cream-deep px-5 py-16 sm:px-8 sm:py-24">
-      <div className="mx-auto max-w-6xl">
-        <SectionHeading
-          eyebrow="Location & contact"
-          title="Come and say hello"
-          intro="Find us on St. Johns Avenue, in the Church End and Roundwood area."
+    <section id="find-us" className="pb-20 pt-24 sm:pb-28 sm:pt-32">
+      <div className={WRAP}>
+        <Reveal as="p" className={eyebrow}>
+          <span className="h-0.5 w-8 bg-clay" aria-hidden="true" />
+          Church End &amp; Roundwood, NW10
+        </Reveal>
+        <MaskLines
+          lines={['Find us on', 'St Johns Avenue']}
+          className="font-display mt-5 text-[clamp(1.9rem,8.6vw,6.5rem)] font-black uppercase leading-[0.92]"
         />
-        <div className="mt-10 grid gap-5 sm:mt-14 lg:grid-cols-[0.9fr_1.4fr]">
-          <Reveal className="flex flex-col gap-7 rounded-[2rem] bg-white p-7 shadow-soft sm:p-9">
-            <div>
-              <p className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-accent">
-                <Phone className="h-4 w-4" aria-hidden="true" />
-                Call us
-              </p>
-              <a
-                href={SHOP.tel}
-                className="mt-2 block text-4xl font-extrabold tracking-tight text-brand transition-colors hover:text-accent sm:text-[2.75rem]"
-              >
-                {SHOP.phone}
-              </a>
+
+        <Reveal className="mt-10 border-y-2 border-ink py-6 sm:py-8">
+          <p className={eyebrow}>
+            <Phone className="h-4 w-4" aria-hidden="true" />
+            Give us a ring
+          </p>
+          <a
+            href={SHOP.tel}
+            className="font-display mt-2 block w-fit whitespace-nowrap text-[clamp(2.4rem,11vw,8.5rem)] font-black leading-none text-clay transition-colors hover:text-ink"
+          >
+            {SHOP.phone}
+          </a>
+        </Reveal>
+
+        <div className="mt-12 grid gap-10 lg:grid-cols-12 lg:gap-14">
+          <Reveal className="relative lg:col-span-7">
+            <div aria-hidden="true" className="absolute -bottom-3 -left-3 h-full w-full bg-ink" />
+            <div className="relative h-[24rem] border-2 border-ink sm:h-[28rem]">
+              {consent === 'accepted' ? (
+                // data-lenis-prevent lets the map handle its own wheel and touch gestures
+                <iframe
+                  data-lenis-prevent
+                  title="Map showing St. John's Mini Market, 90 St. Johns Ave, London NW10 4EG"
+                  src={SHOP.mapEmbed}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  allowFullScreen
+                  className="block h-full w-full bg-cream-deep"
+                />
+              ) : (
+                // Google Maps sets cookies, so it only loads once the visitor agrees.
+                <div className="placeholder-light flex h-full flex-col items-center justify-center gap-4 p-6 text-center">
+                  <MapPin className="h-10 w-10" strokeWidth={1.4} aria-hidden="true" />
+                  <p className="font-display text-2xl font-bold leading-tight sm:text-3xl">
+                    90 St. Johns Ave, NW10 4EG
+                  </p>
+                  <p className="max-w-xs text-sm leading-relaxed">
+                    The map comes from Google and uses cookies, so we wait for your say-so before
+                    loading it.
+                  </p>
+                  <div className="flex flex-wrap justify-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setConsent('accepted')}
+                      className={`${btn} cursor-pointer bg-ink px-6 text-cream hover:bg-ink-soft`}
+                    >
+                      Show the map
+                    </button>
+                    <a
+                      href={SHOP.directions}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`${btn} border-2 border-ink px-6 hover:bg-ink hover:text-cream`}
+                    >
+                      Open in Google Maps
+                    </a>
+                  </div>
+                </div>
+              )}
             </div>
-            <div>
-              <p className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-accent">
-                <MapPin className="h-4 w-4" aria-hidden="true" />
-                Visit us
-              </p>
-              <address className="mt-2 text-xl font-bold not-italic leading-snug text-ink">
-                90 St. Johns Ave,
-                <br />
-                London NW10 4EG
-              </address>
-            </div>
-            <div>
-              <p className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-accent">
-                <Clock className="h-4 w-4" aria-hidden="true" />
-                Hours
-              </p>
-              <p className="mt-2 text-lg font-bold text-ink">Mon to Sun, 7:00am to 11:00pm</p>
-            </div>
-            <a
-              href={SHOP.directions}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`${btnBlue} mt-auto px-6 py-4 text-base`}
-            >
-              <Navigation className="h-5 w-5" aria-hidden="true" />
-              Get Directions
-            </a>
           </Reveal>
 
-          {/* data-lenis-prevent lets the map handle its own wheel and touch gestures */}
-          <Reveal
-            delay={0.08}
-            data-lenis-prevent
-            className="min-h-[22rem] overflow-hidden rounded-[2rem] bg-brand-soft shadow-soft lg:min-h-[30rem]"
-          >
-            <iframe
-              title="Map showing St. John's Mini Market, 90 St. Johns Ave, London NW10 4EG"
-              src={SHOP.mapEmbed}
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              allowFullScreen
-              className="h-full min-h-[22rem] w-full border-0 lg:min-h-[30rem]"
-            />
+          <Reveal delay={0.1} className="lg:col-span-5 lg:self-center">
+            <p className={eyebrow}>
+              <MapPin className="h-4 w-4" aria-hidden="true" />
+              Walk in
+            </p>
+            <address className="font-display mt-3 text-3xl font-bold not-italic leading-tight sm:text-4xl">
+              90 St. Johns Ave,
+              <br />
+              London NW10 4EG
+            </address>
+            <p className="mt-3 text-ink/75">Open every day, 7:00am to 11:00pm.</p>
+
+            <Magnetic className="mt-8 w-full sm:w-fit">
+              <a
+                href={SHOP.directions}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${btn} w-full bg-ink px-7 py-4 text-cream hover:bg-ink-soft`}
+              >
+                <Navigation className="h-4 w-4" aria-hidden="true" />
+                Get Directions
+              </a>
+            </Magnetic>
           </Reveal>
         </div>
       </div>
@@ -447,30 +604,49 @@ function FindUs() {
   )
 }
 
-function Footer() {
+function Footer({ onCookieSettings }) {
+  const link = 'underline-offset-4 transition-colors hover:text-mustard hover:underline'
   return (
-    <footer className="bg-brand-dark px-5 py-12 text-white sm:px-8">
-      <div className="mx-auto flex max-w-6xl flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-2xl font-extrabold">{SHOP.name}</p>
-          <p className="font-semibold text-white/70">{SHOP.tagline}</p>
-          <p className="mt-4 max-w-sm text-white/70">
-            Proud to be part of the NW10 community. Thank you for shopping local.
-          </p>
-        </div>
-        <div className="sm:text-right">
-          <a href={SHOP.tel} className="text-2xl font-extrabold transition-colors hover:text-sun">
-            {SHOP.phone}
-          </a>
-          <p className="mt-2 text-white/70">{SHOP.address}</p>
-          <p className="text-white/70">Open 7 days, 7:00am to 11:00pm</p>
-        </div>
-      </div>
-      <div className="mx-auto mt-10 flex max-w-6xl flex-col gap-2 border-t border-white/15 pt-6 text-sm text-white/60 sm:flex-row sm:justify-between">
-        <p>
-          © {new Date().getFullYear()} {SHOP.name}
+    <footer className="bg-ink text-cream">
+      <div aria-hidden="true" className="awning h-3 sm:h-4" />
+      {/* Extra room at the bottom on phones so the sticky bar and floating buttons never cover the credit. */}
+      <div className={`${WRAP} pb-40 pt-14 sm:pt-16 md:pb-16`}>
+        <p className="font-display text-[clamp(2rem,6vw,4.5rem)] font-black uppercase leading-[0.95]">
+          See you at the shop.
         </p>
-        <p>Website by BOA Network</p>
+        <a
+          href={SHOP.tel}
+          className="font-display mt-6 inline-block text-4xl font-black text-mustard transition-colors hover:text-cream sm:text-5xl"
+        >
+          {SHOP.phone}
+        </a>
+        <p className="mt-6 flex flex-col gap-1 text-cream/85 sm:flex-row sm:flex-wrap sm:gap-x-3">
+          <span className="font-bold text-cream">{SHOP.name}</span>
+          <span className="hidden sm:inline" aria-hidden="true">·</span>
+          <span>{SHOP.address}</span>
+          <span className="hidden sm:inline" aria-hidden="true">·</span>
+          <span>Serving Harlesden, NW10</span>
+        </p>
+        <div className="mt-10 flex flex-col gap-4 border-t border-cream/20 pt-6 font-mono text-xs uppercase tracking-[0.16em] text-cream/75 sm:flex-row sm:items-center sm:justify-between">
+          <ul className="flex flex-wrap gap-x-6 gap-y-1">
+            <li>
+              <a href="/privacy.html" className={`${link} inline-block py-2`}>
+                Privacy Policy
+              </a>
+            </li>
+            <li>
+              <a href="/terms.html" className={`${link} inline-block py-2`}>
+                Terms
+              </a>
+            </li>
+            <li>
+              <button type="button" onClick={onCookieSettings} className={`${link} cursor-pointer py-2 uppercase`}>
+                Cookie settings
+              </button>
+            </li>
+          </ul>
+          <p>Website by BOA Network</p>
+        </div>
       </div>
     </footer>
   )
@@ -478,22 +654,40 @@ function Footer() {
 
 export default function App() {
   useSmoothScroll()
-  const heroRef = useRef(null)
-  // Header turns frosted once the hero has scrolled out from under it.
-  const heroVisible = useInView(heroRef, { margin: '-72px 0px 0px 0px', initial: true })
+  const clock = useShopClock()
+  const [consent, setConsent] = useCookieConsent()
+
+  // The header frosts as soon as the page moves; the floating controls wait for the hero to pass.
+  const [scrolled, setScrolled] = useState(false)
+  const [pastHero, setPastHero] = useState(false)
+  const { scrollY } = useScroll()
+  useMotionValueEvent(scrollY, 'change', (y) => {
+    setScrolled(y > 32)
+    setPastHero(y > window.innerHeight * 0.8)
+  })
 
   return (
-    <MotionConfig reducedMotion="user">
-      <Header frosted={!heroVisible} />
-      <main>
-        <Hero heroRef={heroRef} />
-        <WhatWeSell />
-        <WhyShop />
-        <Services />
-        <Hours />
-        <FindUs />
-      </main>
-      <Footer />
-    </MotionConfig>
+    // LazyMotion loads only the animation features the page uses, which keeps the bundle small.
+    <LazyMotion features={domAnimation} strict>
+      <MotionConfig reducedMotion="user">
+        <Header frosted={scrolled} />
+        <main>
+          <Hero clock={clock} />
+          <PolaroidMarquee />
+          <Neighbourhood />
+          <WhatWeSell />
+          <WhyShop />
+          <Reviews />
+          <Services />
+          <Hours clock={clock} />
+          <FindUs consent={consent} setConsent={setConsent} />
+          <Faq />
+        </main>
+        <Footer onCookieSettings={() => setConsent(null)} />
+        <MobileBar show={pastHero} />
+        <FloatingActions show={pastHero} />
+        <CookieBanner consent={consent} setConsent={setConsent} />
+      </MotionConfig>
+    </LazyMotion>
   )
 }

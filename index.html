@@ -2,18 +2,135 @@
 <html lang="en-GB">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#14317a" />
-    <title>St. John's Mini Market | Food &amp; Wine | London NW10</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <title>St. John's Mini Market | Corner Shop &amp; Off Licence in Harlesden NW10</title>
     <meta
       name="description"
-      content="St. John's Mini Market (Food & Wine), 90 St. Johns Ave, London NW10 4EG. Off licence, groceries, Polish and Caribbean foods, fruit & veg, PayPoint and top-ups. Open 7 days, 7am to 11pm. Call 020 8965 9565."
+      content="St. John's Mini Market (Food &amp; Wine), 90 St. Johns Ave, Harlesden, London NW10 4EG. Caribbean and Polish foods, fresh fruit and veg, off licence, PayPoint, Oyster and mobile top-ups. Open 7 days, 7am to 11pm. Call 020 8965 9565."
     />
+    <meta
+      name="keywords"
+      content="St. John's Mini Market, Food and Wine Harlesden, corner shop NW10, off licence Harlesden, Caribbean food shop NW10, Polish food shop Harlesden, PayPoint NW10, Oyster top up Harlesden, convenience store Church End, Roundwood"
+    />
+    <meta name="author" content="BOA Network" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="theme-color" content="#0b1b3d" />
+    <meta name="format-detection" content="telephone=yes" />
+    <link rel="canonical" href="%VITE_SITE_URL%/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="St. John's Mini Market" />
+    <meta property="og:locale" content="en_GB" />
+    <meta property="og:title" content="St. John's Mini Market | Food · Wine · Everything in between" />
+    <meta
+      property="og:description"
+      content="Your Harlesden corner shop. Caribbean and Polish shelves, fresh fruit and veg, off licence, PayPoint and top-ups. Open 7 days, 7am to 11pm."
+    />
+    <meta property="og:url" content="%VITE_SITE_URL%/" />
+    <meta property="og:image" content="%VITE_SITE_URL%/images/shop-front.jpg" />
+    <meta property="og:image:alt" content="The shop front of St. John's Mini Market on St. Johns Avenue, Harlesden" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="St. John's Mini Market | Food · Wine · Everything in between" />
+    <meta
+      name="twitter:description"
+      content="Your Harlesden corner shop. Caribbean and Polish shelves, fresh fruit and veg, off licence, PayPoint and top-ups. Open 7 days, 7am to 11pm."
+    />
+    <meta name="twitter:image" content="%VITE_SITE_URL%/images/shop-front.jpg" />
+
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="preload" as="image" href="/images/shop-front.jpg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- LocalBusiness schema. The geo coordinates are approximate: replace them with the exact pin from Google Maps. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "GroceryStore",
+        "@id": "%VITE_SITE_URL%/#shop",
+        "name": "St. John's Mini Market",
+        "alternateName": "Food & Wine",
+        "description": "Corner shop and off licence in Harlesden, NW10, selling groceries, Caribbean and Polish foods and fresh fruit and veg, with PayPoint, Oyster and mobile top-ups.",
+        "url": "%VITE_SITE_URL%/",
+        "image": "%VITE_SITE_URL%/images/shop-front.jpg",
+        "telephone": "+442089659565",
+        "priceRange": "£",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "90 St. Johns Ave",
+          "addressLocality": "London",
+          "addressRegion": "Greater London",
+          "postalCode": "NW10 4EG",
+          "addressCountry": "GB"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": 51.5393,
+          "longitude": -0.2449
+        },
+        "areaServed": "Harlesden, London NW10",
+        "openingHoursSpecification": [
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+            "opens": "07:00",
+            "closes": "23:00"
+          }
+        ],
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": 4.2,
+          "reviewCount": 27,
+          "bestRating": 5
+        }
+      }
+    </script>
+
+    <!-- Preloader is plain HTML and CSS so it paints before any JavaScript arrives. -->
+    <style>
+      #preloader {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        display: grid;
+        place-items: center;
+        background: #0b1b3d;
+        color: #f5efe4;
+        font: 900 clamp(3rem, 15vw, 11rem) / 1 'Fraunces Variable', Georgia, 'Times New Roman', serif;
+        letter-spacing: -0.02em;
+        transition: opacity 0.5s ease, visibility 0.5s;
+      }
+      #preloader.done {
+        opacity: 0;
+        visibility: hidden;
+      }
+      html.skip-preloader #preloader {
+        display: none;
+      }
+    </style>
+    <script>
+      // Only show the preloader on the first page of a visit.
+      try {
+        if (sessionStorage.getItem('sj-seen')) document.documentElement.classList.add('skip-preloader')
+        else sessionStorage.setItem('sj-seen', '1')
+      } catch (e) {}
+    </script>
+    <noscript>
+      <style>
+        #preloader {
+          display: none;
+        }
+      </style>
+    </noscript>
   </head>
   <body>
+    <div id="preloader" aria-hidden="true">ST. JOHN'S</div>
     <div id="root"></div>
+    <noscript>
+      <h1>St. John's Mini Market</h1>
+      <p>Food &amp; Wine. 90 St. Johns Ave, London NW10 4EG. Open 7 days a week, 7:00am to 11:00pm.</p>
+      <p>Call us on <a href="tel:+442089659565">020 8965 9565</a>.</p>
+    </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
