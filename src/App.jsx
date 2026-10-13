@@ -230,7 +230,7 @@ function Hero({ clock }) {
           <div aria-hidden="true" className="hero-sky absolute inset-0 -z-10 opacity-85" />
         </>
       )}
-      <GrapeWatermark className="absolute -right-20 top-20 -z-10 w-64 text-burgundy opacity-[0.05] sm:-right-28 sm:top-16 sm:w-[400px]" />
+      <GrapeWatermark className="absolute -right-20 top-20 -z-10 w-64 text-burgundy opacity-[0.13] sm:-right-28 sm:top-16 sm:w-[400px]" />
       <div
         aria-hidden="true"
         className="wine-glow absolute -left-[18%] bottom-[14%] -z-10 h-[62%] w-[120%] sm:-left-[10%] sm:w-[78%]"
@@ -429,7 +429,7 @@ function WhatWeSell() {
   return (
     <section id="what-we-sell" className="relative isolate overflow-clip bg-linear-to-b from-cream to-sand">
       <div aria-hidden="true" className="carnival-stripe" />
-      <GrapeWatermark className="absolute -bottom-20 -left-24 -z-10 w-64 text-burgundy opacity-[0.05] sm:-left-28 sm:w-[400px]" />
+      <GrapeWatermark className="absolute -bottom-20 -left-24 -z-10 w-64 text-burgundy opacity-[0.13] sm:-left-28 sm:w-[400px]" />
       <div className={`${WRAP} pt-12 md:pt-16`}>
         <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-4">
           <div>

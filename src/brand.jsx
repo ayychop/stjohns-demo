@@ -30,8 +30,8 @@ export function Logo({ plate = true, className = '', ...rest }) {
 /**
  * The bunch of grapes from the logo, as a solid shape in the current text
  * colour. Used very large and very faint as a background watermark, always in
- * burgundy: give it a size and an opacity through `className` (about 0.05 on
- * light backgrounds).
+ * burgundy: give it a size and an opacity through `className` (about 0.13 on
+ * light backgrounds, more on the dark footer).
  */
 export function GrapeWatermark({ className = '' }) {
   return (

@@ -44,7 +44,7 @@ The page is meant to read as one continuous piece, not stacked blocks:
 - Every photo gets the same warm grade and vignette from the `photo` class in
   `src/index.css`.
 - `GrapeWatermark` (`src/brand.jsx`) is the logo's bunch of grapes, used very
-  large at about 5% strength behind the hero, What We Sell and the footer.
+  large and faint (about 13% strength) behind the hero, What We Sell and the footer.
 
 The logo is an SVG drawn from outlines, so it is sharp at any size and needs no
 font. `scripts/logo-paths.mjs` holds its wording, layout and colours and writes
