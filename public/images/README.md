@@ -15,7 +15,14 @@ point the matching `src` in the `SHELVES` list in `src/App.jsx` at it.
 
 ## Logo
 
-`logo.png` is the shop's logo and the master file. `logo.webp`, `logo-header.webp`
-and the favicons in `public/` are generated from it: run `npm run brand` after
-replacing it. The favicon is the big "F" cropped from the logo, so if the logo's
-layout changes, update the crop numbers in `scripts/brand-assets.mjs`.
+`logo.png` is the shop's logo and the master file. Everything else is generated
+from it by `npm run brand`:
+
+- `logo-header.webp`, `-2x`, `-3x`: the header logo at 44px tall for each screen density.
+- `logo-footer.webp`, `-2x`, `-3x`: the footer logo at 96px tall.
+- `logo.webp`: full size, for the background watermark.
+- the favicons in `public/`, which are the big "F" cropped from the logo.
+
+The master is 1062x217, so the 3x footer file is enlarged past its source size.
+A larger master would make it crisper. If the logo's layout changes, update the
+favicon crop numbers in `scripts/brand-assets.mjs`.

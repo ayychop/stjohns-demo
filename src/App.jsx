@@ -173,20 +173,22 @@ function StatusDot({ open }) {
 function Header({ frosted }) {
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-50 border-b transition-colors duration-300 ${
-        frosted
-          ? 'border-sign bg-burgundy/80 backdrop-blur-xl backdrop-saturate-150'
-          : 'border-transparent'
-      } text-cream`}
+      // The sign's blue, so the logo reads as part of the bar: solid at the top of the
+      // page, then tinted frosted glass once the page scrolls.
+      className={`fixed inset-x-0 top-0 z-50 border-b border-white/25 text-white transition-colors duration-300 ${
+        frosted ? 'bg-sign/80 backdrop-blur-xl backdrop-saturate-150' : 'bg-sign'
+      }`}
     >
       <div className={`${WRAP} flex h-16 items-center justify-between gap-4 sm:h-[4.5rem]`}>
         <a href="#top" className="shrink-0 transition-opacity hover:opacity-85">
           <img
             src="/images/logo-header.webp"
+            srcSet="/images/logo-header.webp 1x, /images/logo-header-2x.webp 2x, /images/logo-header-3x.webp 3x"
             alt="St. John's Mini Market, Food & Wine"
-            width="470"
-            height="96"
-            className="h-9 w-auto sm:h-11"
+            width="215"
+            height="44"
+            // 44px tall wherever it fits beside the Call Now button; a touch smaller on narrow phones.
+            className="h-9 w-auto min-[420px]:h-11"
           />
         </a>
 
@@ -195,7 +197,7 @@ function Header({ frosted }) {
             <a
               key={item.href}
               href={item.href}
-              className="border-b-2 border-transparent py-1 text-xs font-extrabold uppercase tracking-[0.14em] transition-colors hover:border-parchment hover:text-parchment"
+              className="border-b-2 border-transparent py-1 text-xs font-extrabold uppercase tracking-[0.14em] transition-colors hover:border-white"
             >
               {item.label}
             </a>
@@ -708,13 +710,14 @@ function Footer({ onCookieSettings }) {
           {SHOP.phone}
         </a>
         <img
-          src="/images/logo.webp"
+          src="/images/logo-footer.webp"
+          srcSet="/images/logo-footer.webp 1x, /images/logo-footer-2x.webp 2x, /images/logo-footer-3x.webp 3x"
           alt="St. John's Mini Market, Food & Wine"
-          width="1062"
-          height="217"
+          width="470"
+          height="96"
           loading="lazy"
           decoding="async"
-          className="mt-10 h-auto w-full max-w-sm sm:max-w-md"
+          className="mt-10 h-auto w-full max-w-[470px]"
         />
         <p className="mt-6 flex flex-col gap-1 text-cream/85 sm:flex-row sm:flex-wrap sm:gap-x-3">
           <span className="font-bold text-cream">{SHOP.name}</span>

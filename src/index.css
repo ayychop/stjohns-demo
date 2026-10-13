@@ -18,7 +18,7 @@
   --color-clay-dark: #8b1a24;
   /* The cream-gold of the logo's lettering, for hairlines, small print and hovers. */
   --color-parchment: #e8d9b0;
-  /* The bright blue of the shop sign. Tiny accents only: a dot, a hairline. Never a block. */
+  /* The bright blue of the shop sign: the header bar, plus the odd dot. Nowhere else. */
   --color-sign: #2da4dc;
   /* The same blue, deepened so it stays readable as small text on white. */
   --color-sign-ink: #17709f;

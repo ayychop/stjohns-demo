@@ -4,11 +4,31 @@ import sharp from 'sharp'
 
 const LOGO = 'public/images/logo.png'
 const CREAM = '#f5efe4'
+// Near-lossless: the logo's small lettering shows compression artefacts quickly.
+const WEBP = { quality: 96, alphaQuality: 100, effort: 6, smartSubsample: true }
 
-// Full-size logo for the footer and the background watermark.
-await sharp(LOGO).webp({ quality: 84 }).toFile('public/images/logo.webp')
-// The header shows the logo at most 48px tall, so twice that covers sharp screens.
-await sharp(LOGO).resize({ height: 96 }).webp({ quality: 86 }).toFile('public/images/logo-header.webp')
+const sourceHeight = (await sharp(LOGO).metadata()).height
+
+// One file per screen density, each rendered at exactly the pixels it will occupy,
+// so the browser never has to rescale the logo itself.
+async function variants(name, cssHeight) {
+  for (const density of [1, 2, 3]) {
+    const height = cssHeight * density
+    const suffix = density === 1 ? '' : `-${density}x`
+    await sharp(LOGO)
+      .resize({ height, kernel: 'lanczos3' })
+      // A firmer sharpening pass when the file has to be enlarged past its source size.
+      .sharpen(height > sourceHeight ? { sigma: 1.1 } : { sigma: 0.5 })
+      .webp(WEBP)
+      .toFile(`public/images/${name}${suffix}.webp`)
+  }
+}
+
+await variants('logo-header', 44) // shown 44px tall in the header
+await variants('logo-footer', 96) // shown up to 96px tall in the footer
+
+// Full-size copy for the faint background watermark.
+await sharp(LOGO).webp(WEBP).toFile('public/images/logo.webp')
 
 // The whole wordmark is unreadable at favicon size, so the icon is the big
 // burgundy "F" from FOOD, cropped out and centred on a cream square.
