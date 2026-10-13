@@ -1,19 +1,21 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, m } from 'framer-motion'
 import { ArrowUp, MessageCircle, Navigation, Phone, Plus, Star } from 'lucide-react'
-import { Counter, MaskLines, Reveal, ShopImage, scrollToTop } from './motion.jsx'
+import { Counter, MaskLines, Reveal, scrollToTop } from './motion.jsx'
 import { SHOP, WRAP, btn, eyebrow } from './shop.js'
 
+// Each polaroid is a carnival colour wash with a shop photo printed into it,
+// like a tinted print. To show the photos in full colour instead, remove
+// `mix-blend-luminosity opacity-55` from the image below.
 const POLAROIDS = [
-  { src: '/images/shop-front.jpg', caption: 'Out front', tilt: -4, drop: 6 },
-  { src: '/images/produce.jpg', caption: 'Fresh in today', tilt: 3, drop: -4 },
-  { src: '/images/aisle.jpg', caption: 'Aisle by aisle', tilt: -2, drop: 10 },
-  { src: '/images/produce.jpg', caption: 'Picked this morning', tilt: 5, drop: 0 },
-  { src: '/images/shop-front.jpg', caption: '90 St. Johns Ave', tilt: -3, drop: -6 },
-  { src: '/images/aisle.jpg', caption: 'A taste of home', tilt: 2, drop: 8 },
-  { src: '/images/produce.jpg', caption: 'Plantain, yam, greens', tilt: -5, drop: 2 },
-  { src: '/images/aisle.jpg', caption: 'Polish shelf', tilt: 4, drop: -2 },
-  { src: '/images/shop-front.jpg', caption: 'Harlesden, NW10', tilt: -2, drop: 6 },
+  { src: '/images/shop-front.jpg', caption: 'Out front', wash: 'wash-red', tilt: -4, drop: 6 },
+  { src: '/images/produce.jpg', caption: 'Fresh in today', wash: 'wash-saffron', tilt: 3, drop: -4 },
+  { src: '/images/aisle.jpg', caption: 'A taste of home', wash: 'wash-clay', tilt: -2, drop: 10 },
+  { src: '/images/produce.jpg', caption: 'Plantain, yam, green banana', wash: 'wash-forest', tilt: 5, drop: 0 },
+  { src: '/images/aisle.jpg', caption: 'Polish shelf', wash: 'wash-purple', tilt: -3, drop: -6 },
+  { src: '/images/shop-front.jpg', caption: 'Harlesden, NW10', wash: 'wash-saffron', tilt: 2, drop: 8 },
+  { src: '/images/aisle.jpg', caption: 'Aisle by aisle', wash: 'wash-red', tilt: -5, drop: 2 },
+  { src: '/images/produce.jpg', caption: 'Picked this morning', wash: 'wash-clay', tilt: 4, drop: -2 },
 ]
 
 /** Slow strip of tilted, overlapping polaroids that hangs off the bottom of the hero. */
@@ -21,14 +23,22 @@ export function PolaroidMarquee() {
   return (
     <div aria-hidden="true" className="marquee relative z-10 -mt-20 overflow-x-clip pb-6 sm:-mt-24">
       <div className="marquee-track">
-        {/* Two identical runs: the track slides by exactly one run, then repeats. */}
-        {[...POLAROIDS, ...POLAROIDS].map((photo, i) => (
+        {/* Four identical runs: the track slides by exactly one run, then repeats. */}
+        {[...POLAROIDS, ...POLAROIDS, ...POLAROIDS, ...POLAROIDS].map((photo, i) => (
           <figure
             key={i}
             style={{ transform: `translateY(${photo.drop}px) rotate(${photo.tilt}deg)` }}
-            className="-mr-3 w-36 shrink-0 bg-white p-2 pb-2.5 shadow-[0_16px_32px_-12px_rgb(11_27_61/0.55)] sm:w-48 sm:p-2.5"
+            className="-mr-3 w-36 shrink-0 bg-white p-2 pb-2.5 shadow-[0_16px_32px_-12px_rgb(26_15_12/0.6)] sm:w-48 sm:p-2.5"
           >
-            <ShopImage src={photo.src} alt="" className="aspect-square w-full" />
+            <div className={`wash ${photo.wash} relative aspect-square w-full overflow-hidden`}>
+              <img
+                src={photo.src}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                className="absolute inset-0 h-full w-full object-cover opacity-55 mix-blend-luminosity"
+              />
+            </div>
             <figcaption className="font-display mt-2 truncate text-center text-sm italic text-ink sm:text-base">
               {photo.caption}
             </figcaption>
@@ -122,7 +132,7 @@ export function Reviews() {
                 <figcaption className="mt-6 flex items-center gap-3 border-t border-ink/20 pt-5">
                   <span
                     aria-hidden="true"
-                    className="font-display grid h-10 w-10 place-items-center rounded-full bg-ink text-lg font-bold text-cream"
+                    className="font-display grid h-10 w-10 place-items-center rounded-full bg-forest text-lg font-bold text-cream"
                   >
                     {review.name[0]}
                   </span>
@@ -166,8 +176,9 @@ const FAQS = [
 export function Faq() {
   const [openIndex, setOpenIndex] = useState(0)
   return (
-    <section id="faq" className="border-t-2 border-ink py-20 sm:py-28">
-      <div className={`${WRAP} grid gap-10 lg:grid-cols-12 lg:gap-14`}>
+    <section id="faq">
+      <div aria-hidden="true" className="carnival-stripe" />
+      <div className={`${WRAP} grid gap-10 py-20 sm:py-28 lg:grid-cols-12 lg:gap-14`}>
         <div className="lg:col-span-5">
           <Reveal as="p" className={eyebrow}>
             <span className="h-0.5 w-8 bg-clay" aria-hidden="true" />
@@ -305,7 +316,7 @@ export function FloatingActions({ show }) {
           type="button"
           onClick={scrollToTop}
           aria-label="Back to top"
-          className={`${fab} right-4 border-2 border-cream bg-ink text-cream hover:bg-clay md:right-6`}
+          className={`${fab} right-4 border-2 border-cream bg-burgundy text-cream hover:bg-clay md:right-6`}
         >
           <ArrowUp className="h-6 w-6" aria-hidden="true" />
         </m.button>

@@ -112,6 +112,38 @@ const NAV = [
   { href: '#find-us', label: 'Find Us' },
 ]
 
+// A restrained scatter of carnival-coloured dots: [x, y, radius, colour].
+const CONFETTI = [
+  [182, 14, 3.5, 'fill-clay'],
+  [150, 30, 2, 'fill-saffron'],
+  [196, 46, 2.5, 'fill-forest'],
+  [164, 62, 3, 'fill-saffron'],
+  [120, 12, 2, 'fill-carnival'],
+  [134, 52, 1.5, 'fill-clay'],
+  [188, 82, 2, 'fill-[#5b3260]'],
+  [98, 34, 1.5, 'fill-forest'],
+  [152, 92, 1.5, 'fill-clay'],
+  [76, 16, 2.5, 'fill-saffron'],
+  [110, 70, 2, 'fill-carnival'],
+  [172, 116, 1.5, 'fill-saffron'],
+  [48, 28, 1.5, 'fill-clay'],
+  [196, 132, 2, 'fill-clay'],
+]
+
+function Confetti() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 200 140"
+      className="pointer-events-none absolute -top-7 right-5 w-24 sm:-top-2 sm:right-8 sm:w-52 lg:top-4 lg:w-64"
+    >
+      {CONFETTI.map(([cx, cy, r, colour], i) => (
+        <circle key={i} cx={cx} cy={cy} r={r} className={colour} />
+      ))}
+    </svg>
+  )
+}
+
 /** Pulsing dot: green while the shop is open, red while it is closed. */
 function StatusDot({ open }) {
   const colour = open ? 'bg-[#3ddc84]' : 'bg-[#ff5a4d]'
@@ -168,7 +200,7 @@ function Header({ frosted }) {
 
 function Hero({ clock }) {
   return (
-    <section id="top" className="relative isolate overflow-hidden bg-ink text-cream">
+    <section id="top" className="dusk relative isolate overflow-hidden text-cream">
       <ShopImage
         src="/images/shop-front.jpg"
         alt="The shop front of St. John's Mini Market with its red awning"
@@ -177,10 +209,12 @@ function Hero({ clock }) {
         imgClassName="kenburns"
         eager
       />
+      <div aria-hidden="true" className="dusk-veil absolute inset-0 -z-10" />
       <div
         aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-gradient-to-t from-ink via-ink/75 to-ink/60"
+        className="sun-glow absolute -right-[20%] -top-[12%] -z-10 aspect-square w-[95vw] max-w-[58rem] sm:-right-[8%]"
       />
+      <div aria-hidden="true" className="grain-coarse absolute inset-0 -z-10" />
 
       {/* A touch short of the full screen so the polaroids peek over the fold. */}
       <div className={`${WRAP} flex min-h-[calc(100svh-2.5rem)] flex-col pt-24 sm:pt-28`}>
@@ -190,7 +224,8 @@ function Hero({ clock }) {
           transition={{ duration: 0.6, delay: INTRO_DELAY + 0.5 }}
           className="flex flex-wrap gap-2 text-xs font-semibold tracking-wide sm:text-sm"
         >
-          <p className="inline-flex items-center gap-2.5 border border-cream/30 bg-ink/50 px-3.5 py-2 backdrop-blur-sm">
+          <p className="alive-border inline-flex">
+            <span className="inline-flex items-center gap-2.5 bg-char px-3.5 py-2">
             <StatusDot open={clock.open} />
             <span className="font-bold uppercase tracking-[0.12em]">
               {clock.open ? 'Open now' : 'Closed'}
@@ -200,8 +235,9 @@ function Hero({ clock }) {
               <span className="sr-only">Time in London: </span>
               {clock.time}
             </span>
+            </span>
           </p>
-          <p className="inline-flex items-center gap-2 border border-cream/30 bg-ink/50 px-3.5 py-2 backdrop-blur-sm">
+          <p className="inline-flex items-center gap-2 border border-cream/30 bg-char/50 px-3.5 py-2 backdrop-blur-sm">
             <Star className="h-4 w-4 fill-mustard text-mustard" aria-hidden="true" />
             <span>
               <Counter to={SHOP.rating} decimals={1} /> on Google ·{' '}
@@ -279,17 +315,38 @@ function Hero({ clock }) {
 
 function Neighbourhood() {
   return (
-    <section id="neighbourhood" className="pb-20 pt-10 sm:pb-28 sm:pt-14">
-      <div className={WRAP}>
+    <section id="neighbourhood" className="amber-wash pb-20 pt-10 sm:pb-28 sm:pt-14">
+      <div className={`${WRAP} relative`}>
+        <Confetti />
         <Reveal as="p" className={eyebrow}>
           <span className="h-0.5 w-8 bg-clay" aria-hidden="true" />
           Who we stock for
         </Reveal>
-        <MaskLines
-          lines={['Stocked for the', 'neighbourhood']}
-          className="font-display mt-5 text-[clamp(1.9rem,8.7vw,6rem)] font-black uppercase leading-[0.92]"
-        />
-        <Reveal as="p" delay={0.15} className="mt-6 max-w-md text-lg leading-relaxed text-ink/75 lg:ml-auto lg:mt-2">
+        <div className="relative w-fit">
+          <MaskLines
+            lines={['Stocked for the', 'neighbourhood']}
+            className="font-display mt-5 text-[clamp(1.9rem,8.7vw,6rem)] font-black uppercase leading-[0.92]"
+          />
+          {/* A loose, hand-drawn terracotta line that draws itself under the headline. */}
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 500 18"
+            fill="none"
+            className="absolute left-0 top-full mt-1 w-[78%] overflow-visible text-clay sm:mt-2"
+          >
+            <m.path
+              d="M4 11 C 38 3, 84 15, 142 8 S 236 3, 318 10 S 432 15, 496 5"
+              stroke="currentColor"
+              strokeWidth="3.5"
+              strokeLinecap="round"
+              initial={{ pathLength: 0 }}
+              whileInView={{ pathLength: 1 }}
+              viewport={{ once: true, margin: '0px 0px -12% 0px' }}
+              transition={{ duration: 1.2, delay: 0.5, ease: 'easeOut' }}
+            />
+          </svg>
+        </div>
+        <Reveal as="p" delay={0.15} className="mt-10 max-w-md text-lg leading-relaxed text-ink/75 lg:ml-auto lg:mt-4">
           Caribbean, African, Polish, Irish. Harlesden cooks in a lot of kitchens, and our shelves
           are filled with all of them in mind.
         </Reveal>
@@ -327,8 +384,9 @@ function Neighbourhood() {
 
 function WhatWeSell() {
   return (
-    <section id="what-we-sell" className="border-t-2 border-ink pb-24 pt-14 sm:pb-36 sm:pt-20">
-      <div className={WRAP}>
+    <section id="what-we-sell" className="pb-24 sm:pb-36">
+      <div aria-hidden="true" className="carnival-stripe" />
+      <div className={`${WRAP} pt-14 sm:pt-20`}>
         <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-4">
           <MaskLines
             lines={['What we sell']}
@@ -351,11 +409,11 @@ function WhatWeSell() {
               key={label}
               whileHover={{ y: -6 }}
               transition={{ type: 'spring', stiffness: 320, damping: 24 }}
-              className="group relative flex min-h-60 w-[70vw] max-w-xs shrink-0 snap-start flex-col justify-between border-y border-r border-ink/20 bg-cream p-6 transition-colors duration-300 first:border-l hover:z-10 hover:bg-ink hover:text-cream hover:shadow-lift sm:w-64 lg:min-h-64 lg:w-auto lg:max-w-none lg:border-t-0 lg:p-7 lg:first:border-l-0"
+              className="group relative flex min-h-60 w-[70vw] max-w-xs shrink-0 snap-start flex-col justify-between border-y border-r border-ink/20 bg-cream p-6 transition-colors duration-300 first:border-l hover:z-10 hover:bg-burgundy hover:text-cream hover:shadow-lift sm:w-64 lg:min-h-64 lg:w-auto lg:max-w-none lg:border-t-0 lg:p-7 lg:first:border-l-0"
             >
               <div className="flex items-start justify-between">
                 <Icon
-                  className="h-10 w-10 text-ink transition-colors duration-300 group-hover:text-mustard"
+                  className="h-10 w-10 text-ink transition-colors duration-300 group-hover:text-saffron"
                   strokeWidth={1.4}
                   aria-hidden="true"
                 />
@@ -382,7 +440,7 @@ function WhyShop() {
         {/* The photo climbs out of the top of the block into the section above. */}
         <Reveal className="-mt-12 sm:-mt-20 lg:col-span-5">
           <div className="relative">
-            <div aria-hidden="true" className="absolute -bottom-3 -right-3 h-full w-full bg-ink" />
+            <div aria-hidden="true" className="absolute -bottom-3 -right-3 h-full w-full bg-burgundy" />
             <ShopImage
               src="/images/aisle.jpg"
               alt="Well stocked aisle inside St. John's Mini Market"
@@ -430,7 +488,7 @@ function WhyShop() {
 
 function Services() {
   return (
-    <section id="services" className="bg-ink pb-36 pt-14 text-cream sm:pb-44 sm:pt-16">
+    <section id="services" className="bg-burgundy pb-36 pt-14 text-cream sm:pb-44 sm:pt-16">
       <div className={WRAP}>
         <div className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-2">
           <MaskLines
@@ -449,7 +507,7 @@ function Services() {
               key={label}
               className="flex items-center gap-4 border-b border-cream/20 py-4 transition-colors duration-200 hover:bg-cream/5 sm:flex-col sm:items-start sm:border-r sm:px-5 sm:py-7"
             >
-              <Icon className="h-7 w-7 shrink-0 text-mustard" strokeWidth={1.5} aria-hidden="true" />
+              <Icon className="h-7 w-7 shrink-0 text-saffron" strokeWidth={1.5} aria-hidden="true" />
               <span className="text-base font-bold uppercase leading-snug tracking-[0.06em] sm:text-sm">
                 {label}
               </span>
@@ -465,12 +523,14 @@ function Hours({ clock }) {
   return (
     <section id="hours" className={`${WRAP} -mt-24 sm:-mt-28`}>
       <Reveal className="relative">
-        <div aria-hidden="true" className="absolute -bottom-3 -right-3 hidden h-full w-full bg-mustard sm:block" />
-        <div className="relative grid gap-8 bg-clay px-6 py-10 text-white sm:px-12 sm:py-14 lg:grid-cols-[1fr_auto] lg:items-end">
+        <div aria-hidden="true" className="absolute -bottom-3 -right-3 hidden h-full w-full bg-saffron sm:block" />
+        <div className="relative grid gap-8 bg-carnival px-6 py-10 text-white sm:px-12 sm:py-14 lg:grid-cols-[1fr_auto] lg:items-end">
           <div>
-            <p className="inline-flex items-center gap-2.5 bg-ink px-3.5 py-2 font-mono text-xs font-bold uppercase tracking-[0.2em] text-cream">
-              <StatusDot open={clock.open} />
-              {clock.open ? 'Open now' : 'Closed · Back at 7am'}
+            <p className="alive-border inline-flex">
+              <span className="inline-flex items-center gap-2.5 bg-char px-3.5 py-2 font-mono text-xs font-bold uppercase tracking-[0.2em] text-cream">
+                <StatusDot open={clock.open} />
+                {clock.open ? 'Open now' : 'Closed · Back at 7am'}
+              </span>
             </p>
             <h2 className="mt-6">
               <span className="sr-only">Opening hours: </span>
@@ -479,7 +539,7 @@ function Hours({ clock }) {
                 lines={['7am – 11pm']}
                 className="font-display block text-[clamp(3.2rem,13vw,10rem)] font-black uppercase leading-[0.9] text-cream"
               />
-              <span className="font-display mt-2 block text-[clamp(1.6rem,4.5vw,3.5rem)] font-medium italic leading-tight text-ink">
+              <span className="font-display mt-2 block text-[clamp(1.6rem,4.5vw,3.5rem)] font-medium italic leading-tight text-saffron">
                 Every single day
               </span>
             </h2>
@@ -528,7 +588,7 @@ function FindUs({ consent, setConsent }) {
 
         <div className="mt-12 grid gap-10 lg:grid-cols-12 lg:gap-14">
           <Reveal className="relative lg:col-span-7">
-            <div aria-hidden="true" className="absolute -bottom-3 -left-3 h-full w-full bg-ink" />
+            <div aria-hidden="true" className="absolute -bottom-3 -left-3 h-full w-full bg-burgundy" />
             <div className="relative h-[24rem] border-2 border-ink sm:h-[28rem]">
               {consent === 'accepted' ? (
                 // data-lenis-prevent lets the map handle its own wheel and touch gestures
@@ -556,7 +616,7 @@ function FindUs({ consent, setConsent }) {
                     <button
                       type="button"
                       onClick={() => setConsent('accepted')}
-                      className={`${btn} cursor-pointer bg-ink px-6 text-cream hover:bg-ink-soft`}
+                      className={`${btn} cursor-pointer bg-burgundy px-6 text-cream hover:bg-carnival`}
                     >
                       Show the map
                     </button>
@@ -591,7 +651,7 @@ function FindUs({ consent, setConsent }) {
                 href={SHOP.directions}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`${btn} w-full bg-ink px-7 py-4 text-cream hover:bg-ink-soft`}
+                className={`${btn} w-full bg-burgundy px-7 py-4 text-cream hover:bg-carnival`}
               >
                 <Navigation className="h-4 w-4" aria-hidden="true" />
                 Get Directions
@@ -607,8 +667,8 @@ function FindUs({ consent, setConsent }) {
 function Footer({ onCookieSettings }) {
   const link = 'underline-offset-4 transition-colors hover:text-mustard hover:underline'
   return (
-    <footer className="bg-ink text-cream">
-      <div aria-hidden="true" className="awning h-3 sm:h-4" />
+    <footer className="dusk-footer text-cream">
+      <div aria-hidden="true" className="carnival-stripe" />
       {/* Extra room at the bottom on phones so the sticky bar and floating buttons never cover the credit. */}
       <div className={`${WRAP} pb-40 pt-14 sm:pt-16 md:pb-16`}>
         <p className="font-display text-[clamp(2rem,6vw,4.5rem)] font-black uppercase leading-[0.95]">
@@ -616,7 +676,7 @@ function Footer({ onCookieSettings }) {
         </p>
         <a
           href={SHOP.tel}
-          className="font-display mt-6 inline-block text-4xl font-black text-mustard transition-colors hover:text-cream sm:text-5xl"
+          className="font-display mt-6 inline-block text-4xl font-black text-saffron transition-colors hover:text-cream sm:text-5xl"
         >
           {SHOP.phone}
         </a>

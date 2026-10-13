@@ -10,10 +10,19 @@
   --color-cream: #f5efe4;
   --color-cream-deep: #e9dcc3;
   --color-clay: #d2451e;
-  --color-clay-dark: #b03614;
   --color-mustard: #e8b33d;
+  --color-saffron: #f2a93b;
+  --color-carnival: #9b1d20;
+  /* Hover and pressed state for terracotta buttons and links. */
+  --color-clay-dark: #9b1d20;
+  --color-forest: #2e5a3b;
+  --color-burgundy: #3a1414;
+  --color-plum: #4a1d24;
+  --color-ember: #7a2e1e;
+  --color-char: #1a0f0c;
 
-  --shadow-lift: 0 24px 48px -20px rgb(11 27 61 / 0.45);
+  /* Shadows are warm brown, never cold black. */
+  --shadow-lift: 0 24px 48px -20px rgb(26 15 12 / 0.5);
 }
 
 @layer base {
@@ -96,11 +105,98 @@
   }
 
   .placeholder-dark {
-    background-color: var(--color-ink);
+    background-color: var(--color-burgundy);
+    background-image: repeating-linear-gradient(135deg, rgb(245 239 228 / 0.04) 0 2px, transparent 2px 14px);
+  }
+
+  /* Harlesden dusk: plum sky, terracotta glow, warm charcoal ground. */
+  .dusk {
+    background: linear-gradient(180deg, var(--color-plum) 0%, var(--color-ember) 38%, var(--color-char) 100%);
+  }
+  /* The same sky as a veil over the hero photo, so the photo shows through warm. */
+  .dusk-veil {
+    background: linear-gradient(
+      180deg,
+      rgb(74 29 36 / 0.86) 0%,
+      rgb(122 46 30 / 0.72) 38%,
+      rgb(26 15 12 / 0.95) 100%
+    );
+  }
+  .dusk-footer {
+    background: linear-gradient(180deg, var(--color-plum) 0%, var(--color-burgundy) 45%, var(--color-char) 100%);
+  }
+  /* Low sun behind the headline. */
+  .sun-glow {
+    background: radial-gradient(
+      closest-side,
+      rgb(242 169 59 / 0.26),
+      rgb(210 69 30 / 0.14) 48%,
+      transparent
+    );
+    filter: blur(40px);
+  }
+  /* A second, coarser grain for the hero only. */
+  .grain-coarse {
+    opacity: 0.06;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.45' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 300px 300px;
+  }
+
+  /* Hairline border that drifts between terracotta and saffron. Wrap the pill in it with 1px of padding. */
+  .alive-border {
+    padding: 1px;
+    background: linear-gradient(
+        90deg,
+        var(--color-clay),
+        var(--color-saffron),
+        var(--color-clay),
+        var(--color-saffron),
+        var(--color-clay)
+      )
+      0 0 / 200% 100%;
+    animation: border-shift 6s linear infinite;
+  }
+
+  /* Thin carnival ribbon used as a divider between some sections. */
+  .carnival-stripe {
+    height: 3px;
+    background-image: repeating-linear-gradient(
+      135deg,
+      var(--color-clay) 0 12px,
+      var(--color-saffron) 12px 24px,
+      var(--color-forest) 24px 36px
+    );
+  }
+
+  .amber-wash {
+    background-image: linear-gradient(180deg, rgb(242 169 59 / 0.09), rgb(242 169 59 / 0) 70%);
+  }
+
+  /* Polaroid colour washes: a muted carnival colour with warm light catching the top corner. */
+  .wash {
     background-image:
-      radial-gradient(90% 70% at 85% 100%, rgb(210 69 30 / 0.5), transparent 70%),
-      radial-gradient(60% 50% at 10% 0%, rgb(232 179 61 / 0.16), transparent 70%),
-      repeating-linear-gradient(135deg, rgb(245 239 228 / 0.04) 0 2px, transparent 2px 14px);
+      radial-gradient(120% 95% at 0% 0%, rgb(255 226 178 / 0.6), transparent 58%),
+      linear-gradient(160deg, var(--wash-a), var(--wash-b));
+  }
+  .wash-red {
+    --wash-a: #a3272a;
+    --wash-b: #6a1417;
+  }
+  .wash-saffron {
+    --wash-a: #e2a33f;
+    --wash-b: #b87720;
+  }
+  .wash-clay {
+    --wash-a: #c9552f;
+    --wash-b: #8f351b;
+  }
+  .wash-forest {
+    --wash-a: #3b6b49;
+    --wash-b: #1f4029;
+  }
+  .wash-purple {
+    --wash-a: #5b3260;
+    --wash-b: #341b39;
   }
 
   .no-scrollbar {
@@ -116,11 +212,11 @@
     will-change: transform;
   }
 
-  /* Polaroid strip. The track holds two identical runs, so sliding it by half loops seamlessly. */
+  /* Polaroid strip. The track holds four identical runs, so sliding it by a quarter loops seamlessly. */
   .marquee-track {
     display: flex;
     width: max-content;
-    animation: marquee 80s linear infinite;
+    animation: marquee 70s linear infinite;
   }
   .marquee:hover .marquee-track {
     animation-play-state: paused;
@@ -165,13 +261,20 @@
 
 @keyframes marquee {
   to {
-    transform: translateX(-50%);
+    transform: translateX(-25%);
+  }
+}
+
+@keyframes border-shift {
+  to {
+    background-position: 100% 0;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .kenburns,
-  .marquee-track {
+  .marquee-track,
+  .alive-border {
     animation: none;
   }
 }
