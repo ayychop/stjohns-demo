@@ -12,3 +12,10 @@ Then run `npm run images` from the project root. It resizes the hero to at most
 
 If you have a dedicated photo for the Caribbean or Polish shelf, add it here and
 point the matching `src` in the `SHELVES` list in `src/App.jsx` at it.
+
+## Logo
+
+`logo.png` is the shop's logo and the master file. `logo.webp`, `logo-header.webp`
+and the favicons in `public/` are generated from it: run `npm run brand` after
+replacing it. The favicon is the big "F" cropped from the logo, so if the logo's
+layout changes, update the crop numbers in `scripts/brand-assets.mjs`.

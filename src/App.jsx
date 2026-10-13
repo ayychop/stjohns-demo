@@ -128,6 +128,16 @@ const CONFETTI = [
   [172, 116, 1.5, 'fill-saffron'],
   [48, 28, 1.5, 'fill-clay'],
   [196, 132, 2, 'fill-clay'],
+  // The one dot of sign blue.
+  [136, 104, 2.5, 'fill-sign'],
+]
+
+// A few thin diagonal strokes beside the dots: [x, y, colour].
+const HATCH = [
+  [58, 96, 'stroke-carnival'],
+  [70, 96, 'stroke-saffron'],
+  [82, 96, 'stroke-clay'],
+  [94, 96, 'stroke-carnival'],
 ]
 
 function Confetti() {
@@ -139,6 +149,9 @@ function Confetti() {
     >
       {CONFETTI.map(([cx, cy, r, colour], i) => (
         <circle key={i} cx={cx} cy={cy} r={r} className={colour} />
+      ))}
+      {HATCH.map(([x, y, colour]) => (
+        <line key={x} x1={x} y1={y + 22} x2={x + 16} y2={y} strokeWidth="2" strokeLinecap="round" className={colour} />
       ))}
     </svg>
   )
@@ -162,16 +175,19 @@ function Header({ frosted }) {
     <header
       className={`fixed inset-x-0 top-0 z-50 border-b transition-colors duration-300 ${
         frosted
-          ? 'border-ink/15 bg-cream/75 text-ink backdrop-blur-xl backdrop-saturate-150'
-          : 'border-transparent text-cream'
-      }`}
+          ? 'border-sign bg-burgundy/80 backdrop-blur-xl backdrop-saturate-150'
+          : 'border-transparent'
+      } text-cream`}
     >
       <div className={`${WRAP} flex h-16 items-center justify-between gap-4 sm:h-[4.5rem]`}>
-        <a href="#top" className="leading-none transition-opacity hover:opacity-80">
-          <span className="font-display block text-xl font-bold sm:text-2xl">St. John's</span>
-          <span className="mt-1 block text-[0.6rem] font-bold uppercase tracking-[0.3em]">
-            Mini Market
-          </span>
+        <a href="#top" className="shrink-0 transition-opacity hover:opacity-85">
+          <img
+            src="/images/logo-header.webp"
+            alt="St. John's Mini Market, Food & Wine"
+            width="470"
+            height="96"
+            className="h-9 w-auto sm:h-11"
+          />
         </a>
 
         <nav aria-label="Main" className="hidden items-center gap-7 lg:flex">
@@ -179,7 +195,7 @@ function Header({ frosted }) {
             <a
               key={item.href}
               href={item.href}
-              className="border-b-2 border-transparent py-1 text-xs font-bold uppercase tracking-[0.16em] transition-colors hover:border-clay"
+              className="border-b-2 border-transparent py-1 text-xs font-extrabold uppercase tracking-[0.14em] transition-colors hover:border-parchment hover:text-parchment"
             >
               {item.label}
             </a>
@@ -237,7 +253,7 @@ function Hero({ clock }) {
             </span>
             </span>
           </p>
-          <p className="inline-flex items-center gap-2 border border-cream/30 bg-char/50 px-3.5 py-2 backdrop-blur-sm">
+          <p className="inline-flex items-center gap-2 border border-parchment/50 bg-char/50 px-3.5 py-2 backdrop-blur-sm">
             <Star className="h-4 w-4 fill-mustard text-mustard" aria-hidden="true" />
             <span>
               <Counter to={SHOP.rating} decimals={1} /> on Google ·{' '}
@@ -295,7 +311,7 @@ function Hero({ clock }) {
           </m.div>
         </div>
 
-        <div className="flex items-center justify-between gap-4 border-t border-cream/25 py-4 font-mono text-[0.7rem] uppercase tracking-[0.2em] text-cream/80 sm:text-xs">
+        <div className="flex items-center justify-between gap-4 border-t border-parchment/40 py-4 font-mono text-[0.7rem] uppercase tracking-[0.2em] text-parchment sm:text-xs">
           <p className="flex items-center gap-2.5">
             <span className="h-1.5 w-1.5 bg-mustard" aria-hidden="true" />
             <span>
@@ -315,7 +331,18 @@ function Hero({ clock }) {
 
 function Neighbourhood() {
   return (
-    <section id="neighbourhood" className="amber-wash pb-20 pt-10 sm:pb-28 sm:pt-14">
+    <section id="neighbourhood" className="cream-to-clay relative overflow-x-clip pb-20 pt-10 sm:pb-28 sm:pt-14">
+      {/* The shop's logo as a faint watermark behind the section. */}
+      <img
+        src="/images/logo.webp"
+        alt=""
+        aria-hidden="true"
+        width="1062"
+        height="217"
+        loading="lazy"
+        decoding="async"
+        className="pointer-events-none absolute -right-[12%] top-28 w-[125%] max-w-none -rotate-6 opacity-[0.08] sm:top-20 sm:w-[90%] lg:-right-[4%] lg:top-10 lg:w-[72%]"
+      />
       <div className={`${WRAP} relative`}>
         <Confetti />
         <Reveal as="p" className={eyebrow}>
@@ -365,7 +392,7 @@ function Neighbourhood() {
                   imgClassName={shelf.crop}
                 />
                 {/* Photo on top and copy beneath on phones; the caption overlaps the photo on desktop. */}
-                <div className="relative mt-5 bg-cream lg:-mt-12 lg:ml-6 lg:mr-8 lg:p-6 lg:pb-0">
+                <div className="relative mt-5 lg:-mt-12 lg:ml-6 lg:mr-8 lg:bg-cream lg:p-6">
                   <p className="font-mono text-xs tracking-[0.2em]">0{i + 1}</p>
                   <h3 className="font-display mt-2 text-3xl font-bold leading-none sm:text-4xl">
                     {shelf.title}
@@ -665,7 +692,7 @@ function FindUs({ consent, setConsent }) {
 }
 
 function Footer({ onCookieSettings }) {
-  const link = 'underline-offset-4 transition-colors hover:text-mustard hover:underline'
+  const link = 'underline-offset-4 transition-colors hover:text-cream hover:underline'
   return (
     <footer className="dusk-footer text-cream">
       <div aria-hidden="true" className="carnival-stripe" />
@@ -680,6 +707,15 @@ function Footer({ onCookieSettings }) {
         >
           {SHOP.phone}
         </a>
+        <img
+          src="/images/logo.webp"
+          alt="St. John's Mini Market, Food & Wine"
+          width="1062"
+          height="217"
+          loading="lazy"
+          decoding="async"
+          className="mt-10 h-auto w-full max-w-sm sm:max-w-md"
+        />
         <p className="mt-6 flex flex-col gap-1 text-cream/85 sm:flex-row sm:flex-wrap sm:gap-x-3">
           <span className="font-bold text-cream">{SHOP.name}</span>
           <span className="hidden sm:inline" aria-hidden="true">·</span>
@@ -687,7 +723,7 @@ function Footer({ onCookieSettings }) {
           <span className="hidden sm:inline" aria-hidden="true">·</span>
           <span>Serving Harlesden, NW10</span>
         </p>
-        <div className="mt-10 flex flex-col gap-4 border-t border-cream/20 pt-6 font-mono text-xs uppercase tracking-[0.16em] text-cream/75 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-10 flex flex-col gap-4 border-t border-parchment/30 pt-6 font-mono text-xs uppercase tracking-[0.16em] text-parchment sm:flex-row sm:items-center sm:justify-between">
           <ul className="flex flex-wrap gap-x-6 gap-y-1">
             <li>
               <a href="/privacy.html" className={`${link} inline-block py-2`}>

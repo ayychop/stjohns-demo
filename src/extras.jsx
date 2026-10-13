@@ -4,6 +4,7 @@ import { ArrowUp, MessageCircle, Navigation, Phone, Plus, Star } from 'lucide-re
 import { Counter, MaskLines, Reveal, scrollToTop } from './motion.jsx'
 import { SHOP, WRAP, btn, eyebrow } from './shop.js'
 
+// Captions are in the sign's blue, like biro on a real polaroid.
 // Each polaroid is a carnival colour wash with a shop photo printed into it,
 // like a tinted print. To show the photos in full colour instead, remove
 // `mix-blend-luminosity opacity-55` from the image below.
@@ -39,7 +40,7 @@ export function PolaroidMarquee() {
                 className="absolute inset-0 h-full w-full object-cover opacity-55 mix-blend-luminosity"
               />
             </div>
-            <figcaption className="font-display mt-2 truncate text-center text-sm italic text-ink sm:text-base">
+            <figcaption className="font-display mt-2 truncate text-center text-sm italic text-sign-ink sm:text-base">
               {photo.caption}
             </figcaption>
           </figure>

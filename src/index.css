@@ -12,9 +12,16 @@
   --color-clay: #d2451e;
   --color-mustard: #e8b33d;
   --color-saffron: #f2a93b;
-  --color-carnival: #9b1d20;
+  /* The deep red of "FOOD" in the shop's logo. */
+  --color-carnival: #8b1a24;
   /* Hover and pressed state for terracotta buttons and links. */
-  --color-clay-dark: #9b1d20;
+  --color-clay-dark: #8b1a24;
+  /* The cream-gold of the logo's lettering, for hairlines, small print and hovers. */
+  --color-parchment: #e8d9b0;
+  /* The bright blue of the shop sign. Tiny accents only: a dot, a hairline. Never a block. */
+  --color-sign: #2da4dc;
+  /* The same blue, deepened so it stays readable as small text on white. */
+  --color-sign-ink: #17709f;
   --color-forest: #2e5a3b;
   --color-burgundy: #3a1414;
   --color-plum: #4a1d24;
@@ -168,8 +175,14 @@
     );
   }
 
-  .amber-wash {
-    background-image: linear-gradient(180deg, rgb(242 169 59 / 0.09), rgb(242 169 59 / 0) 70%);
+  /* Warm cream at the top deepening towards terracotta at the bottom. */
+  .cream-to-clay {
+    background-image: linear-gradient(
+      180deg,
+      rgb(242 169 59 / 0.1) 0%,
+      rgb(232 217 176 / 0.35) 40%,
+      rgb(210 69 30 / 0.2) 100%
+    );
   }
 
   /* Polaroid colour washes: a muted carnival colour with warm light catching the top corner. */

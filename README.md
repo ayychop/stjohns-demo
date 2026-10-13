@@ -9,6 +9,7 @@ npm install
 npm run dev      # http://localhost:5173
 npm run build    # production build in dist/
 npm run images   # shrink the photos in public/images to web sizes
+npm run brand    # rebuild the logo files and favicons from public/images/logo.png
 ```
 
 ## Before going live
